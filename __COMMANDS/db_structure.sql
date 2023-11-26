@@ -58,7 +58,7 @@ CREATE TABLE teacher (
 CREATE TABLE subject (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	name nvarchar(50) NOT NULL,
-	code nvarchar(36) NOT NULL,
+	code nvarchar(36) UNIQUE NOT NULL,
 	created_date DATE DEFAULT (CURRENT_DATE)
 );
 
