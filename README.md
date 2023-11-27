@@ -1,7 +1,7 @@
 # MyPortal
 
 ### AUTHORS
-- [Mohammed Khalid](https://github.com/LORDyyyyy) - [Email](mailto:ilordyyy@gmail.com)
+- [Mohammed Khalid](https://github.com/LORDyyyyy) - <ilordyyy@gmail.com>
 - [Mostafa Mokhtar](https://github.com/mostsfa538) - <TODO>
 - [Mostafa Abdel-raheim](https://github.com/Mostafa-araheim) - <TODO>
 - Mohammed Shaaban - <TODO>
