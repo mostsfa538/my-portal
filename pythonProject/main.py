@@ -97,9 +97,15 @@ def register_teacher():
         cur.close()
 
         if existing_teacher:
-            flash('register is successful', 'success')
+            flash('Teacher already registered. Please choose a different email.', 'danger')
         else:
-            flash('NOT successful', 'danger')
+            cur = mysql.connection.cursor()
+            cur.execute(
+                "INSERT INTO teacher (first_name, last_name, date_of_birth, email, password) VALUES (%s, %s, %s, %s, %s)",
+                (firstName, lastName, date, email, hashed_password))
+            mysql.connection.commit()
+            cur.close()
+            flash('Teacher information added successfully!', 'success')
 
     return render_template("registerTeacher.html", form=form)
 
