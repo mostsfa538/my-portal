@@ -81,12 +81,13 @@ def login():
     return render_template("loginStudent.html", form=form)
 
 
-@app.route('/registerTeacherr', methods=['GET', 'POST'])
+@app.route('/registerTeacher', methods=['GET', 'POST'])
 def register_teacher():
     form = RegistrationTeacher()
     if form.validate_on_submit():
         firstName = form.firstName.data
         lastName = form.lastName.data
+        date = '2004-01-5'
         email = form.email.data
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -130,7 +131,9 @@ def teacher_login():
 
     return render_template("loginTeacher.html", form=form)
 
-
+@app.route('/')
+def hello():
+    return ('hello')
 
 if __name__ == '__main__':
     app.run(debug=True)
