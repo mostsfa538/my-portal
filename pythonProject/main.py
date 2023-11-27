@@ -34,7 +34,7 @@ def home():
         date = '2004-01-05'
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash('password').decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM student WHERE email = %s", (email,))
@@ -60,21 +60,22 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash('password').decode('utf-8')
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM student WHERE email = %s", (email,))
         existing_student = cur.fetchone()
-        cur.close()
 
+        cur.execute("SHOW columns FROM student")
+        column_names = [column[0] for column in cur.fetchall()]
+        existing_student_dict = dict(zip(column_names, existing_student))
+        cur.close()
         if existing_student:
-            cur = mysql.connection.cursor()
-            cur.execute("SELECT * FROM student WHERE password = %s", (hashed_password,))
-            existing_student = cur.fetchone()
-            cur.close()
-            if existing_student:
+            is_valid = bcrypt.check_password_hash(
+                        existing_student_dict['password'],
+                        password)
+            if is_valid:
                 flash('Login is successful', 'success')
             else:
-                flash('Login is NOT successful. Check your email and password.', 'danger')
+                flash(f'Login is NOT successful. Check your email and password!', 'danger')
         else:
             flash('Login is NOT successful. Check your email and password.', 'danger')
 
@@ -131,7 +132,7 @@ def teacher_login():
             if existing_teacher:
                 flash('Login is successful', 'success')
             else:
-                flash('Login is NOT successful. Check your email and password.', 'danger')
+                flash('Login is NOT successful. Check your email and password!!!!!!!!!!!!!!!!1.', 'danger')
         else:
             flash('Login is NOT successful. Check your email and password.', 'danger')
 

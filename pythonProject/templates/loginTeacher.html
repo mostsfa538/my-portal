@@ -14,7 +14,7 @@
     {% endif %}
   {% endwith %}
 
-  <form method="POST" action="/loginTeacherr">
+  <form method="POST" action="/loginTeacher">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
     {{ form.email.label }} {{ form.email }}<br>
