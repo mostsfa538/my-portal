@@ -102,7 +102,7 @@ def home():
         firstName = form.firstName.data
         middleName = form.middleName.data
         lastName = form.lastName.data
-        #dat
+        date = '2004-01-05'
         email = form.email.data
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash('password').decode('utf-8')
@@ -116,8 +116,8 @@ def home():
             flash('Email already exists. Please choose a different email.', 'danger')
         else:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO student (first_name, middle_name, last_name, email, password) VALUES (%s, %s, %s, %s, %s)",
-                        (firstName, middleName, lastName, email, hashed_password))
+            cur.execute("INSERT INTO student (first_name, middle_name, last_name, date_of_birth, email, password) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (firstName, middleName, lastName, date, email, hashed_password))
             mysql.connection.commit()
             cur.close()
             flash('Student information added successfully!', 'success')

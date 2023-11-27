@@ -121,5 +121,13 @@ CREATE TABLE grade(
 );
 
 
-
+CREATE TABLE quiz(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    description nvarchar(256),
+    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    start_time TIMESTAMP NOT NULL,
+    duration INT NOT NULL,
+    sub_id INT NOT NULL,
+    FOREIGN KEY (sub_id) REFERENCES subject(id)
+);
 
