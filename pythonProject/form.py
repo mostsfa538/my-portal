@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email
 
 
-class RegistrationForm(FlaskForm):
+class RegistrationStudent(FlaskForm):
     firstName = StringField('First Name', validators=[DataRequired(), Length(min=2, max=15)])
     middleName = StringField('Middle Name')
     lastName = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=15)])
@@ -11,7 +11,19 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
-class LoginForm(FlaskForm):
+class Login_student(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+class RegistrationTeacher(FlaskForm):
+    firstName = StringField('First Name', validators=[DataRequired(), Length(min=2, max=15)])
+    lastName = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=15)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Submit')
+
+class Login_teacher(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
