@@ -13,8 +13,8 @@ hello = Blueprint('hello', __name__)
 
 @register_student.route('/registerStudent', methods=['GET', 'POST'])
 def register():
-    if current_user.is_is_authenticated:
-        return redirect(url_for('home'))
+    # if current_user.is_is_authenticated:
+        # return redirect(url_for('home'))
     form = RegistrationStudent()
 
     if form.validate_on_submit():
@@ -27,7 +27,11 @@ def register():
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM student WHERE email = %s", (email,))
+        cur.execute("SELECT email FROM student\
+                    WHERE email LIKE (%s)\
+                    UNION\
+                    SELECT email FROM teacher\
+                    WHERE email LIKE (%s)", (email, email))
         existing_student = cur.fetchone()
         cur.close()
 
@@ -43,44 +47,6 @@ def register():
             flash('Student information added successfully!', 'success')
 
     return render_template("registerStudent.html", form=form)
-
-@login.route('/login', methods=['GET', 'POST'])
-def logins():
-    form = Login()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        cur = mysql.connection.cursor()
-
-        cur.execute("""
-            SELECT s.*, t.* 
-            FROM student s 
-            LEFT JOIN teacher t ON s.email = t.email
-            WHERE s.email = %s OR t.email = %s
-        """, (email, email))
-
-        column_names = [column[0] for column in cur.description]
-        result = cur.fetchone()
-        cur.close()
-
-        if result:
-            existing_user_dict = dict(zip(column_names, result))
-            is_valid = bcrypt.check_password_hash(
-                existing_user_dict['password'],
-                password)
-
-            if is_valid:
-                if 's_email' in existing_user_dict:
-                    flash('Login as student is successful', 'success')
-                elif 't_email' in existing_user_dict:
-                    flash('Login as teacher is successful', 'success')
-            else:
-                flash(f'Login is NOT successful. Check your email and password!', 'danger')
-        else:
-            flash('Login is NOT successful. Check your email and password.', 'danger')
-
-    return render_template("login.html", form=form)
-
 @register_teacher.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
     form = RegistrationTeacher()
@@ -92,12 +58,16 @@ def registerTeacher():
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM teacher WHERE email = %s", (email,))
+        cur.execute("SELECT email FROM student\
+                    WHERE email LIKE (%s)\
+                    UNION\
+                    SELECT email FROM teacher\
+                    WHERE email LIKE (%s)", (email, email))
         existing_teacher = cur.fetchone()
         cur.close()
 
         if existing_teacher:
-            flash('Teacher already registered. Please choose a different email.', 'danger')
+            flash('Email already registered. Please choose a different email.', 'danger')
         else:
             cur = mysql.connection.cursor()
             cur.execute(
@@ -114,3 +84,42 @@ def registerTeacher():
 @hello.route('/')
 def home():
     return 'hello Word!'
+
+
+@login.route('/login', methods=['GET', 'POST'])
+def logins():
+    form = Login()
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        cur = mysql.connection.cursor()
+
+        cur.execute("""
+            SELECT email, password, 'student' as role
+            FROM student
+            WHERE email = %s
+            UNION
+            SELECT email, password, 'teacher' as role
+            FROM teacher
+            WHERE email = %s
+        """, (email, email))
+
+        column_names = [column[0] for column in cur.description]
+        result = cur.fetchone()
+        cur.close()
+
+        if result:
+            existing_user_dict = dict(zip(column_names, result))
+            is_valid = bcrypt.check_password_hash(
+                existing_user_dict['password'],
+                password)
+
+            if is_valid:
+                role = existing_user_dict['role']
+                flash(f'Login as {role} is successful', 'success')
+            else:
+                flash(f'Login is NOT successful. Check your email and password!', 'danger')
+        else:
+            flash('Login is NOT successful. Check your email and password.', 'danger')
+
+    return render_template("login.html", form=form)

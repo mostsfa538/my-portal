@@ -15,7 +15,7 @@
   {% endwith %}
 
   <!-- Include the form in the template -->
-  <form method="POST" action="/loginn">
+  <form method="POST" action="/login">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
     {{ form.email.label }} {{ form.email }}<br>
