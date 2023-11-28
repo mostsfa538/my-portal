@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, flash, url_for, redirect, session, Flask
 from form import RegistrationStudent, Login, RegistrationTeacher, Logout
 from DB_connect import mysql
+from DB_connect import app
 from flask_bcrypt import Bcrypt
-app = Flask(__name__)
+# app = Flask(__name__)
 bcrypt = Bcrypt()
 app.secret_key = "Hello"
 
