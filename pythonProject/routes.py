@@ -1,24 +1,19 @@
-from flask import Blueprint, render_template, flash, url_for, redirect, session, app
+from flask import Blueprint, render_template, flash, url_for, redirect, session, Flask
 from form import RegistrationStudent, Login, RegistrationTeacher, Logout
 from DB_connect import mysql
 from flask_bcrypt import Bcrypt
-from flask_login import login_user, current_user, logout_user, login_required
-
+app = Flask(__name__)
 bcrypt = Bcrypt()
 app.secret_key = "Hello"
-register_student = Blueprint('register_student', __name__)
-login = Blueprint('login', __name__)
-register_teacher = Blueprint('register_teacher', __name__)
-Logout = Blueprint('Logout', __name__)
-hello = Blueprint('hello', __name__)
 
 
-@hello.route('/')
-def home():
-    return 'hello Word!'
+
+@app.route('/')
+def ess():
+    return 'Hello Word!'
 
 
-@register_student.route('/registerStudent', methods=['GET', 'POST'])
+@app.route('/registerStudent', methods=['GET', 'POST'])
 def register():
 
     form = RegistrationStudent()
@@ -57,7 +52,7 @@ def register():
     return render_template("registerStudent.html", form=form)
 
 
-@register_teacher.route('/registerTeacher', methods=['GET', 'POST'])
+@app.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
     form = RegistrationTeacher()
     if form.validate_on_submit():
@@ -93,7 +88,7 @@ def registerTeacher():
     return render_template("registerTeacher.html", form=form)
 
 
-@login.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def logins():
     form = Login()
 
@@ -137,7 +132,10 @@ def logins():
 
     return render_template("login.html", form=form)
 
-@Logout.route('/logout', methods=['POST'])
-def out():
-    session.pop("email", None)
-    return redirect('/login')
+@app.route('/logout', methods=['GET', 'POST'])
+def home():
+    form = Logout()
+    if form.validate_on_submit():
+        session.pop("email", None)
+        return redirect('/login')
+    # return 'hello Word!'
