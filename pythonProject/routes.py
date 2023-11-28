@@ -1,17 +1,15 @@
-from flask import Blueprint, render_template, flash, url_for, redirect, session, Flask
+from flask import render_template, flash, redirect, session
 from form import RegistrationStudent, Login, RegistrationTeacher, Logout
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
-# app = Flask(__name__)
 bcrypt = Bcrypt()
 app.secret_key = "Hello"
 
 
-
 @app.route('/')
-def ess():
-    return 'Hello Word!'
+def org():
+    return "Welcome nega"
 
 
 @app.route('/registerStudent', methods=['GET', 'POST'])
@@ -96,7 +94,7 @@ def logins():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        session['eamil'] = email
+        session['email'] = email
 
         if 'email' in session:
             return redirect("/")
@@ -122,9 +120,6 @@ def logins():
             is_valid = bcrypt.check_password_hash(existing_user_dict['password'], password)
 
             if is_valid:
-                role = existing_user_dict['role']
-                flash(f'Login as {role} is successful', 'success')
-
                 return redirect("/")
             else:
                 flash(f'Login is NOT successful. Check your email and password!', 'danger')
@@ -133,10 +128,17 @@ def logins():
 
     return render_template("login.html", form=form)
 
-@app.route('/logout', methods=['GET', 'POST'])
-def home():
-    form = Logout()
-    if form.validate_on_submit():
-        session.pop("email", None)
+@app.route('/test')
+def ess():
+    successful = ('email' in session)
+    if successful:
+        return redirect('/')
+    else:
         return redirect('/login')
-    # return 'hello Word!'
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    form = Logout()
+    session.pop("email", None)
+    return redirect('/login')
