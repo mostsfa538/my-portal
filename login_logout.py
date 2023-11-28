@@ -1,20 +1,14 @@
-from flask import render_template, flash, redirect, session
 from form import RegistrationStudent, Login, RegistrationTeacher, Logout
+from flask import render_template, flash, redirect, session
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
+
 bcrypt = Bcrypt()
-app.secret_key = "Hello"
-
-
-@app.route('/')
-def org():
-    return "Welcome nega"
 
 
 @app.route('/registerStudent', methods=['GET', 'POST'])
 def register():
-
     form = RegistrationStudent()
 
     if form.validate_on_submit():
@@ -24,7 +18,8 @@ def register():
         date = '2004-01-05'
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
         session['email'] = email
 
         cur = mysql.connection.cursor()
@@ -37,16 +32,19 @@ def register():
         cur.close()
 
         if existing_student:
-            flash('Email already exists. Please choose a different email.', 'danger')
+            flash('Email already exists. Please choose a different email.',
+                  'danger')
         else:
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO student (first_name, middle_name, last_name, date_of_birth, email, password) "
+            cur.execute("INSERT INTO student (first_name, middle_name,\
+                        last_name, date_of_birth, email, password) "
                         "VALUES (%s, %s, %s, %s, %s, %s)",
-                        (firstName, middleName, lastName, date, email, hashed_password))
+                        (firstName, middleName, lastName, date,
+                         email, hashed_password))
             mysql.connection.commit()
             cur.close()
             # flash('Student information added successfully!', 'success')
-            return redirect("/")
+            return redirect("/login")
 
     return render_template("registerStudent.html", form=form)
 
@@ -60,8 +58,8 @@ def registerTeacher():
         date = '2004-01-5'
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        session['email'] = email
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
         cur = mysql.connection.cursor()
         cur.execute("SELECT email FROM student\
                     WHERE email LIKE (%s)\
@@ -77,12 +75,13 @@ def registerTeacher():
         else:
             cur = mysql.connection.cursor()
             cur.execute(
-                "INSERT INTO teacher (first_name, last_name, date_of_birth, email, password) "
+                "INSERT INTO teacher (first_name, last_name, date_of_birth,\
+                email, password) "
                 "VALUES (%s, %s, %s, %s, %s)",
                 (firstName, lastName, date, email, hashed_password))
             mysql.connection.commit()
             cur.close()
-            return redirect("/")
+            return redirect("/login")
 
     return render_template("registerTeacher.html", form=form)
 
@@ -90,51 +89,51 @@ def registerTeacher():
 @app.route('/login', methods=['GET', 'POST'])
 def logins():
     form = Login()
+    if 'email' in session:
+        return redirect("/home")
 
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        session['email'] = email
-
-        if 'email' in session:
-            return redirect("/")
 
         cur = mysql.connection.cursor()
 
         cur.execute("""
-            SELECT email, password, 'student' as role
+            SELECT email, password, id, 'student' as role
             FROM student
             WHERE email = %s
             UNION
-            SELECT email, password, 'teacher' as role
+            SELECT email, password, id,'teacher' as role
             FROM teacher
             WHERE email = %s
         """, (email, email))
 
         column_names = [column[0] for column in cur.description]
         result = cur.fetchone()
+        email, unused_password, id, role = result
         cur.close()
 
         if result:
             existing_user_dict = dict(zip(column_names, result))
-            is_valid = bcrypt.check_password_hash(existing_user_dict['password'], password)
+            is_valid = bcrypt.check_password_hash(
+                existing_user_dict['password'], password)
 
             if is_valid:
+                session['email'] = email
+                session['id'] = id
+                session['role'] = role
+                print(f'{session}')
                 return redirect("/")
             else:
-                flash(f'Login is NOT successful. Check your email and password!', 'danger')
+                flash('Login is NOT successful.\
+                      Check your email and password!',
+                      'danger')
         else:
-            flash('Login is NOT successful. Check your email and password.', 'danger')
+            flash('Login is NOT successful.\
+                  Check your email and password.',
+                  'danger')
 
     return render_template("login.html", form=form)
-
-@app.route('/test')
-def ess():
-    successful = ('email' in session)
-    if successful:
-        return redirect('/')
-    else:
-        return redirect('/login')
 
 
 @app.route('/logout', methods=['GET', 'POST'])

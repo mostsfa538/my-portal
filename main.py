@@ -1,6 +1,8 @@
 from DB_connect import app
 from flask_bcrypt import Bcrypt
-from routes import *
+from login_logout import *
+from home import *
+
 
 bcrypt = Bcrypt(app)
 
