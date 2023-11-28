@@ -1,20 +1,26 @@
-from flask import Blueprint, render_template, flash, url_for, redirect
-from form import RegistrationStudent, Login, RegistrationTeacher
+from flask import Blueprint, render_template, flash, url_for, redirect, session, app
+from form import RegistrationStudent, Login, RegistrationTeacher, Logout
 from DB_connect import mysql
 from flask_bcrypt import Bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 
 bcrypt = Bcrypt()
-
+app.secret_key = "Hello"
 register_student = Blueprint('register_student', __name__)
 login = Blueprint('login', __name__)
 register_teacher = Blueprint('register_teacher', __name__)
+Logout = Blueprint('Logout', __name__)
 hello = Blueprint('hello', __name__)
+
+
+@hello.route('/')
+def home():
+    return 'hello Word!'
+
 
 @register_student.route('/registerStudent', methods=['GET', 'POST'])
 def register():
-    # if current_user.is_is_authenticated:
-        # return redirect(url_for('home'))
+
     form = RegistrationStudent()
 
     if form.validate_on_submit():
@@ -25,6 +31,7 @@ def register():
         email = form.email.data
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        session['email'] = email
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT email FROM student\
@@ -44,9 +51,12 @@ def register():
                         (firstName, middleName, lastName, date, email, hashed_password))
             mysql.connection.commit()
             cur.close()
-            flash('Student information added successfully!', 'success')
+            # flash('Student information added successfully!', 'success')
+            return redirect("/")
 
     return render_template("registerStudent.html", form=form)
+
+
 @register_teacher.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
     form = RegistrationTeacher()
@@ -57,6 +67,7 @@ def registerTeacher():
         email = form.email.data
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        session['email'] = email
         cur = mysql.connection.cursor()
         cur.execute("SELECT email FROM student\
                     WHERE email LIKE (%s)\
@@ -67,7 +78,8 @@ def registerTeacher():
         cur.close()
 
         if existing_teacher:
-            flash('Email already registered. Please choose a different email.', 'danger')
+            flash('Email already registered. Please login.', 'danger')
+            return redirect("login")
         else:
             cur = mysql.connection.cursor()
             cur.execute(
@@ -76,22 +88,23 @@ def registerTeacher():
                 (firstName, lastName, date, email, hashed_password))
             mysql.connection.commit()
             cur.close()
-            flash('Teacher information added successfully!', 'success')
+            return redirect("/")
 
     return render_template("registerTeacher.html", form=form)
-
-
-@hello.route('/')
-def home():
-    return 'hello Word!'
 
 
 @login.route('/login', methods=['GET', 'POST'])
 def logins():
     form = Login()
+
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
+        session['eamil'] = email
+
+        if 'email' in session:
+            return redirect("/")
+
         cur = mysql.connection.cursor()
 
         cur.execute("""
@@ -110,16 +123,21 @@ def logins():
 
         if result:
             existing_user_dict = dict(zip(column_names, result))
-            is_valid = bcrypt.check_password_hash(
-                existing_user_dict['password'],
-                password)
+            is_valid = bcrypt.check_password_hash(existing_user_dict['password'], password)
 
             if is_valid:
                 role = existing_user_dict['role']
                 flash(f'Login as {role} is successful', 'success')
+
+                return redirect("/")
             else:
                 flash(f'Login is NOT successful. Check your email and password!', 'danger')
         else:
             flash('Login is NOT successful. Check your email and password.', 'danger')
 
     return render_template("login.html", form=form)
+
+@Logout.route('/logout', methods=['POST'])
+def out():
+    session.pop("email", None)
+    return redirect(url_for('login'))

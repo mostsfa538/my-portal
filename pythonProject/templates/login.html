@@ -14,7 +14,6 @@
     {% endif %}
   {% endwith %}
 
-  <!-- Include the form in the template -->
   <form method="POST" action="/login">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}

@@ -11,10 +11,12 @@ class RegistrationStudent(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+
 class Login(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
 
 class RegistrationTeacher(FlaskForm):
     firstName = StringField('First Name', validators=[DataRequired(), Length(min=2, max=15)])
@@ -23,3 +25,6 @@ class RegistrationTeacher(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+
+class Logout(FlaskForm):
+    submit = SubmitField('Logout')
