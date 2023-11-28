@@ -73,7 +73,7 @@ def login():
     return render_template("loginStudent.html", form=form)
 
 @register_teacher.route('/registerTeacher', methods=['GET', 'POST'])
-def register_teacher():
+def registerTeacher():
     form = RegistrationTeacher()
     if form.validate_on_submit():
         firstName = form.firstName.data
@@ -134,5 +134,5 @@ def teacher_login():
 
 
 @hello.route('/')
-def hello():
+def home():
     return 'Hello, World!'
