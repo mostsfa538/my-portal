@@ -14,3 +14,4 @@
 - flask_mysqldb
 - flask_bcrypt
 - flask_wtf
+- flask_login

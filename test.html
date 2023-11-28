@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title></title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+	</head>
+	<body>
+		<input id="phone"> </input>
+		<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+		<script>
+			const input = document.querySelector("#phone");
+			window.intlTelInput(input, {
+				utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+		  });
+			window.intlTelInput(input, {
+		 customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+    return "e.g. " + selectedCountryPlaceholder;
+  },
+});
+		</script>
+	</body>
+</html>

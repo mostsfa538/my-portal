@@ -140,4 +140,4 @@ def logins():
 @Logout.route('/logout', methods=['POST'])
 def out():
     session.pop("email", None)
-    return redirect(url_for('login'))
+    return redirect('/login')
