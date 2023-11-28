@@ -1,18 +1,20 @@
-from flask import Blueprint, render_template, flash
-from form import RegistrationStudent, Login_student, RegistrationTeacher, Login_teacher
+from flask import Blueprint, render_template, flash, url_for, redirect
+from form import RegistrationStudent, Login, RegistrationTeacher
 from DB_connect import mysql
 from flask_bcrypt import Bcrypt
+from flask_login import login_user, current_user, logout_user, login_required
 
 bcrypt = Bcrypt()
 
 register_student = Blueprint('register_student', __name__)
-login_student = Blueprint('login_student', __name__)
+login = Blueprint('login', __name__)
 register_teacher = Blueprint('register_teacher', __name__)
-login_teacher = Blueprint('login_teacher', __name__)
 hello = Blueprint('hello', __name__)
 
 @register_student.route('/registerStudent', methods=['GET', 'POST'])
-def home():
+def register():
+    if current_user.is_is_authenticated:
+        return redirect(url_for('home'))
     form = RegistrationStudent()
 
     if form.validate_on_submit():
@@ -42,35 +44,42 @@ def home():
 
     return render_template("registerStudent.html", form=form)
 
-@login_student.route('/loginStudent', methods=['GET', 'POST'])
-def login():
-    form = Login_student()
+@login.route('/login', methods=['GET', 'POST'])
+def logins():
+    form = Login()
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
         cur = mysql.connection.cursor()
 
-        cur.execute("SELECT * FROM student WHERE email = %s", (email,))
-        column_names = [column[0] for column in cur.description]
+        cur.execute("""
+            SELECT s.*, t.* 
+            FROM student s 
+            LEFT JOIN teacher t ON s.email = t.email
+            WHERE s.email = %s OR t.email = %s
+        """, (email, email))
 
-        cur.execute("SELECT * FROM student WHERE email = %s", (email,))
-        existing_student = cur.fetchone()
+        column_names = [column[0] for column in cur.description]
+        result = cur.fetchone()
         cur.close()
 
-        if existing_student:
-            existing_student_dict = dict(zip(column_names, existing_student))
+        if result:
+            existing_user_dict = dict(zip(column_names, result))
             is_valid = bcrypt.check_password_hash(
-                existing_student_dict['password'],
+                existing_user_dict['password'],
                 password)
 
             if is_valid:
-                flash('Login is successful', 'success')
+                if 's_email' in existing_user_dict:
+                    flash('Login as student is successful', 'success')
+                elif 't_email' in existing_user_dict:
+                    flash('Login as teacher is successful', 'success')
             else:
                 flash(f'Login is NOT successful. Check your email and password!', 'danger')
         else:
             flash('Login is NOT successful. Check your email and password.', 'danger')
 
-    return render_template("loginStudent.html", form=form)
+    return render_template("login.html", form=form)
 
 @register_teacher.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
@@ -102,37 +111,6 @@ def registerTeacher():
     return render_template("registerTeacher.html", form=form)
 
 
-@login_teacher.route('/loginTeacher', methods=['GET', 'POST'])
-def teacher_login():
-    form = Login_teacher()
-    if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
-        cur = mysql.connection.cursor()
-
-        cur.execute("SELECT * FROM teacher WHERE email = %s", (email,))
-        column_names = [column[0] for column in cur.description]
-
-        cur.execute("SELECT * FROM teacher WHERE email = %s", (email,))
-        existing_teacher = cur.fetchone()
-        cur.close()
-
-        if existing_teacher:
-            existing_teacher_dict = dict(zip(column_names, existing_teacher))
-            is_valid = bcrypt.check_password_hash(
-                existing_teacher_dict['password'],
-                password)
-
-            if is_valid:
-                flash('Login is successful', 'success')
-            else:
-                flash('Login is NOT successful. Check your email and password', 'danger')
-        else:
-            flash('Login is NOT successful. Check your email and password.', 'danger')
-
-    return render_template("loginTeacher.html", form=form)
-
-
 @hello.route('/')
 def home():
-    return 'Hello, World!'
+    return 'hello Word!'
