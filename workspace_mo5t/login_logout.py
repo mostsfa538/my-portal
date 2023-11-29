@@ -133,7 +133,7 @@ def logins():
                   Check your email and password.',
                   'danger')
 
-    return render_template("login.html", form=form)
+    return render_template('login.html', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])

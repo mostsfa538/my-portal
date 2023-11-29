@@ -1,7 +1,5 @@
-from DB_connect import mysql
 from DB_connect import app
-from flask import render_template, flash, redirect, session
-
+from flask import redirect, session
 
 
 @app.route('/home')
@@ -16,10 +14,7 @@ def home():
 @app.route('/')
 def root():
     successful = ('email' in session)
-    # print(successful)
     if successful:
         return redirect('/home')
     else:
         return redirect('/login')
-
-
