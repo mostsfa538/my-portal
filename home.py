@@ -8,7 +8,8 @@ from flask import render_template, flash, redirect, session
 def home():
     successful = ('email' in session)
     if successful:
-        return ('123')
+        return render_template('/home.html', title='Home Page',
+                               email = session['email'])
     else:
         return redirect('/login')
 
