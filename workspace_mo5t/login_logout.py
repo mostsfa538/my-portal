@@ -10,6 +10,8 @@ bcrypt = Bcrypt()
 @app.route('/registerStudent', methods=['GET', 'POST'])
 def register():
     form = RegistrationStudent()
+    if 'email' in session:
+        return redirect("/home")
 
     if form.validate_on_submit():
         firstName = form.firstName.data
@@ -52,6 +54,8 @@ def register():
 @app.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
     form = RegistrationTeacher()
+    if 'email' in session:
+        return redirect("/home")
     if form.validate_on_submit():
         firstName = form.firstName.data
         lastName = form.lastName.data
@@ -110,14 +114,13 @@ def logins():
 
         column_names = [column[0] for column in cur.description]
         result = cur.fetchone()
-        email, unused_password, id, role = result
         cur.close()
 
         if result:
             existing_user_dict = dict(zip(column_names, result))
             is_valid = bcrypt.check_password_hash(
                 existing_user_dict['password'], password)
-
+            email, unused_password, id, role = result
             if is_valid:
                 session['email'] = email
                 session['id'] = id
