@@ -22,7 +22,6 @@ def register():
         password = form.password.data
         hashed_password = bcrypt.generate_password_hash(
             password).decode('utf-8')
-        session['email'] = email
 
         cur = mysql.connection.cursor()
         cur.execute("SELECT email FROM student\
@@ -143,4 +142,6 @@ def logins():
 def logout():
     form = Logout()
     session.pop("email", None)
+    session.pop("id", None)
+    session.pop("role", None)
     return redirect('/login')

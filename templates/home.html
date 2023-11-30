@@ -12,6 +12,11 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+		const Swal = require('sweetalert2')
+	</script>
+
 	<style>
 		.pfp {
 			width: 85%;
@@ -76,40 +81,168 @@
 
 	<section class="container-fluid">
 		<div class="row p-1 d-none d-md-flex rounded-end-circle">
-			<h1 class="display-5">Welcome, {{email }} <span class="col-3 fs-3" id="dateTime">
+			<h1 class="display-5">Welcome, {{ first_name }} <span class="col-3 fs-3" id="dateTime">
 				</span>
 			</h1>
 
 		</div>
 		<div class="row p-4">
-			<a class="col-1 sub-card m-2 card p-3 bg-light border border-5 d-flex align-items-center justify-content-center"
-				style="width: 13.5rem; height: 13.5rem;" href="#">
-				<div class="card rounded bg-primary mb-3 d-flex align-items-center
-				justify-content-center text-light fs-1 fw-bold" style="width: 5rem; height: 5rem;">
-					DS
-				</div>
-				<p class="card-text fs-5 text-center p-0 m-0">Data Structure</p>
-				<p class="card-text fs-5 text-center p-0 m-0">2022-2023</p>
-			</a>
-
-			<a class="col-1 sub-card m-2 card p-3 bg-light border border-5 d-flex align-items-center justify-content-center"
-				style="width: 13.5rem; height: 13.5rem;" href="#">
+			{% for sub in subs %}
+				<a class="col-1 sub-card m-2 card p-3 bg-light border border-5 d-flex align-items-center justify-content-center"
+					style="width: 13.5rem; height: 13.5rem;" href="/subject/{{sub.code}}" target="_blank">
+					<div class="card rounded mb-3 d-flex align-items-center
+						justify-content-center text-light fs-1 fw-bold" style="width: 5rem; height: 5rem; background: {{sub.color}};">
+						{{ sub.logo }}
+					</div>
+					<p class="card-text fs-6 text-center p-0 m-0">{{ sub.name }}</p>
+					<p class="card-text fs-6 text-center p-0 m-0">{{ sub.created_date }}</p>
+				</a>
+			{% endfor %}
+			<a class="col-1 sub-card m-2 card p-3 btn btn-primary bg-light border border-5 d-flex align-items-center justify-content-center"
+				style="width: 13.5rem; height: 13.5rem;"  data-bs-toggle="modal"
+					data-bs-target="#addSubjectModal" id="myButton">
 				<div class="card rounded bg-warning mb-3 d-flex align-items-center
 			justify-content-center text-light fs-1 fw-bold" style="width: 5rem; height: 5rem;">
 					<i class="bi bi-plus fs-1 fw-bold"></i>
 				</div>
-
 			</a>
 		</div>
 	</section>
 
+	<!-- Modal -->
+	<div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="addSubjectModalLabel">Modal title</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">
+						{{ message }}
+					</div>
+					{% endfor %}
+					{% endif %}
+					{% endwith%}
+					<form method="POST" action="/home" novalidate>
+						{{ form.hidden_tag() }}
+						{% if role == "student"%}
+						<div class="form-group mb-2">
+							{{ form.subjectCode.label(class="form-label-control") }}
+							{% if form.subjectCode.errors %}
+							{{ form.subjectCode(class="form-control is-invalid") }}
+							<div class="invalid-feedback">
+								{% for error in form.subjectCode.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ form.subjectCode(class="form-control", id='user-input') }}
+							{% endif %}
+						</div>
+						{% elif role == "teacher"%}
+						<div class="form-group mb-2">
+							{{ form.subjectName.label(class="form-label-control") }}
+							{% if form.subjectName.errors %}
+							{{ form.subjectName(class="form-control is-invalid") }}
+							<div class="invalid-feedback">
+								{% for error in form.subjectName.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ form.subjectName(class="form-control", id='user-input') }}
+							{% endif %}
+						</div>
+						<div id="email-fields" class="form-group mb-2">
+							{% for email in form.emails %}
+							{{ email.label(class="form-label-control") }}
+							{% if email.errors %}
+							{{ email(class="form-control is-invalid") }}
+							<div class="invalid-feedback">
+								{% for error in email.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ email(class="form-control") }}
+							{% endif %}
+							{% endfor %}
+						</div>
+						<button type="button" onclick="addEmailField()" class="btn btn-primary">Add Secondary
+							Teacher</button>
+						<br>
+						{% endif %}
+						{% if message %}
+						<script>
+							Swal.fire({
+								title: "Done!",
+								text: "Subject Added Succecfully!",
+								icon: "success"
+							});
+						</script>
+						{{endif}}
+						{% endif %}
 
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+						Close
+					</button>
+					{{ form.submit(class='btn btn-primary', id='submit-btn', disabled='disabled') }}
+				</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
 		crossorigin="anonymous"></script>
 
 	<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+
+	<script>
+		index = 1;
+		function addEmailField() {
+			var container = document.getElementById('email-fields');
+
+			var label = document.createElement('label');
+			label.setAttribute('for', `emails-${index}`);
+			label.textContent = `#${index} Secondary Teacher Email`;
+			label.classList.add('form-label-control');
+
+			var input = document.createElement('input');
+			input.setAttribute('id', `emails-${index}`);
+			input.setAttribute('name', `emails-${index}`);
+			input.setAttribute('required', '');
+			input.setAttribute('type', 'text');
+			input.setAttribute('value', '');
+			input.classList.add('form-control');
+
+			container.appendChild(label);
+			container.appendChild(input);
+			index += 1;
+		}
+		document.getElementById('user-input').addEventListener('input', function () {
+			var inputValue = this.value.trim();
+			var submitBtn = document.getElementById('submit-btn');
+
+			if (inputValue.length > 0) {
+				submitBtn.removeAttribute('disabled');
+			} else {
+				submitBtn.setAttribute('disabled', 'disabled');
+			}
+		});
+	</script>
+
+	{% if submit%}
+	<script> document.getElementById('myButton').click();</script>
+	{% endif %}
 </body>
 
 </html>
