@@ -8,4 +8,9 @@ def subject_page(code):
     successful = ('email' in session)
     if not successful:
         return redirect('/login')
-    return render_template('subject.html')
+    first_name = ''
+    email = session['email']
+    id = session['id']
+    submit = True
+    role = session['role']
+    return render_template('subject.html', role=role)
