@@ -11,6 +11,7 @@ class RegistrationStudent(FlaskForm):
                            Length(min=2, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('confirm_password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -27,6 +28,7 @@ class RegistrationTeacher(FlaskForm):
                            Length(min=2, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('confirm_password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 

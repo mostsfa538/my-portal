@@ -1,0 +1,29 @@
+
+.dark-light {
+    background-color: #3663fc;
+    color: #ffffff;
+}
+
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+body.dark-mode .dark-light,
+body.dark-mode .dark-light-card {
+    background-color: #673ab7;
+}
+/* body.dark-mode	.dark-light-card p{ */
+/* 	color: white !important; */
+/* } */
+
+/* body.dark-mode .dark-light-card:hover { */
+/* 	background-color: #e0dddd !important; */
+/* } */
+/* body.dark-mode .dark-light-card:hover p { */
+/* 	color: black !important; */
+/* } */
+
+/* body.dark-mode .dark-light-modal{ */
+/* 	color: black !important; */
+/* } */
