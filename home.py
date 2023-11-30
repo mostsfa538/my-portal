@@ -58,7 +58,7 @@ def home():
             cur.execute("INSERT INTO subject (name, code) VALUES (%s, %s)",
                         (subject_name, code))
             new_sub_id = cur.lastrowid
-            cur.execute("INSERT INTO teacher_sub VALUES (%s, %s)",
+            cur.execute("INSERT INTO teacher_sub VALUES (1, %s, %s)",
                         (id, new_sub_id))
             mysql.connection.commit()
             cur.close()
