@@ -72,6 +72,7 @@ CREATE TABLE teacher_sub (
 	primary_teacher BIT DEFAULT(0),
 	teacher_id INT NOT NULL,
 	sub_id INT NOT NULL,
+	PRIMARY KEY  (teacher_id, sub_id),
 	FOREIGN KEY (teacher_id) REFERENCES teacher(id),
 	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE
 );
@@ -80,6 +81,7 @@ CREATE TABLE teacher_sub (
 CREATE TABLE student_sub (
 	student_id VARCHAR(15) NOT NULL,
 	sub_id INT NOT NULL,
+	PRIMARY KEY (student_id, sub_id),
 	FOREIGN KEY (student_id) REFERENCES student(id),
 	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE
 );
