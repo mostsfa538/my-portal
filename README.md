@@ -10,10 +10,10 @@
 
 
 ### Requirements
-- flask
-- flask_wtf
-- flask_login
-- flask_bcrypt
-- flask_session
-- flask_mysqldb
-
+- python
+    - flask
+    - flask_wtf
+    - flask_login
+    - flask_bcrypt
+    - flask_session
+    - flask_mysqldb
