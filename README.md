@@ -5,13 +5,15 @@
 - [Mostafa Mokhtar](https://github.com/mostsfa538) - <mostafa51moktar@gmail.com>
 - [Mostafa Abdel-raheim](https://github.com/Mostafa-araheim) - <mostafa.araheim@gmail.com>
 - Mohammed Shaaban - <TODO>
-- [Mohammed Medhet](https://github.com/Mohamedbeko443) - <TODO>
+- [Mohammed Medhet](https://github.com/Mohamedbeko443) - <mohamedmertens@gmail.com>
 - Mahmoud Talaat - <TODO>
 
 
 ### Requirements
 - flask
-- flask_mysqldb
-- flask_bcrypt
 - flask_wtf
 - flask_login
+- flask_bcrypt
+- flask_session
+- flask_mysqldb
+
