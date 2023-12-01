@@ -5,7 +5,6 @@ from form import Student_SubjectForm, Teacher_SubjectForm
 import random
 import uuid
 
-
 def subject_add_from_type():
     role = session.get('role')
     if role == 'student':

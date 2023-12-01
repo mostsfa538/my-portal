@@ -1,11 +1,10 @@
-from form import RegistrationStudent, Login, RegistrationTeacher, Logout
+from form import RegistrationStudent, Login, RegistrationTeacher
 from flask import render_template, flash, redirect, session
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
-
+from forgotpassword import forgotpassword
 bcrypt = Bcrypt()
-
 
 @app.route('/registerStudent', methods=['GET', 'POST'])
 def register():
@@ -20,36 +19,31 @@ def register():
         date = '2004-01-05'
         email = form.email.data
         password = form.password.data
-        confirm_password = form.confirm_password.data
-        if password != confirm_password:
-            flash('password NOT match.',
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
+
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email FROM student\
+                    WHERE email LIKE (%s)\
+                    UNION\
+                    SELECT email FROM teacher\
+                    WHERE email LIKE (%s)", (email, email))
+        existing_student = cur.fetchone()
+        cur.close()
+
+        if existing_student:
+            flash('Email already exists. Please choose a different email.',
                   'danger')
         else:
-            hashed_password = bcrypt.generate_password_hash(
-                password).decode('utf-8')
-
             cur = mysql.connection.cursor()
-            cur.execute("SELECT email FROM student\
-                        WHERE email LIKE (%s)\
-                        UNION\
-                        SELECT email FROM teacher\
-                        WHERE email LIKE (%s)", (email, email))
-            existing_student = cur.fetchone()
+            cur.execute("INSERT INTO student (first_name, middle_name,\
+                        last_name, date_of_birth, email, password) "
+                        "VALUES (%s, %s, %s, %s, %s, %s)",
+                        (firstName, middleName, lastName, date,
+                         email, hashed_password))
+            mysql.connection.commit()
             cur.close()
-
-            if existing_student:
-                flash('Email already exists. Please choose a different email.',
-                      'danger')
-            else:
-                cur = mysql.connection.cursor()
-                cur.execute("INSERT INTO student (first_name, middle_name,\
-                            last_name, date_of_birth, email, password) "
-                            "VALUES (%s, %s, %s, %s, %s, %s)",
-                            (firstName, middleName, lastName, date,
-                            email, hashed_password))
-                mysql.connection.commit()
-                cur.close()
-                return redirect("/login")
+            return redirect("/login")
 
     return render_template("registerStudent.html", form=form)
 
@@ -65,34 +59,30 @@ def registerTeacher():
         date = '2004-01-5'
         email = form.email.data
         password = form.password.data
-        confirm_password = form.confirm_password.data
-        if password != confirm_password:
-            flash('password NOT match.',
-                  'danger')
-        else:
-            hashed_password = bcrypt.generate_password_hash(
-                password).decode('utf-8')
-            cur = mysql.connection.cursor()
-            cur.execute("SELECT email FROM student\
-                        WHERE email LIKE (%s)\
-                        UNION\
-                        SELECT email FROM teacher\
-                        WHERE email LIKE (%s)", (email, email))
-            existing_teacher = cur.fetchone()
-            cur.close()
+        hashed_password = bcrypt.generate_password_hash(
+            password).decode('utf-8')
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email FROM student\
+                    WHERE email LIKE (%s)\
+                    UNION\
+                    SELECT email FROM teacher\
+                    WHERE email LIKE (%s)", (email, email))
+        existing_teacher = cur.fetchone()
+        cur.close()
 
-            if existing_teacher:
-                flash('Email already registered. Please login.', 'danger')
-            else:
-                cur = mysql.connection.cursor()
-                cur.execute(
-                    "INSERT INTO teacher (first_name, last_name, date_of_birth,\
-                    email, password) "
-                    "VALUES (%s, %s, %s, %s, %s)",
-                    (firstName, lastName, date, email, hashed_password))
-                mysql.connection.commit()
-                cur.close()
-                return redirect("/login")
+        if existing_teacher:
+            flash('Email already registered. Please login.', 'danger')
+            return redirect("login")
+        else:
+            cur = mysql.connection.cursor()
+            cur.execute(
+                "INSERT INTO teacher (first_name, last_name, date_of_birth,\
+                email, password) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                (firstName, lastName, date, email, hashed_password))
+            mysql.connection.commit()
+            cur.close()
+            return redirect("/login")
 
     return render_template("registerTeacher.html", form=form)
 
@@ -148,8 +138,14 @@ def logins():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    form = Logout()
     session.pop("email", None)
     session.pop("id", None)
     session.pop("role", None)
     return redirect('/login')
+
+
+
+@app.route('/path')
+def signup():
+    return render_template('path.html')
+

@@ -6,13 +6,11 @@ from wtforms.validators import DataRequired, Length, Email, Optional
 class RegistrationStudent(FlaskForm):
     firstName = StringField('First Name', validators=[DataRequired(),
                             Length(min=2, max=15)])
-    middleName = StringField('Middle Name', validators=[DataRequired(),
-                            Length(min=2, max=15)])
+    middleName = StringField('Middle Name')
     lastName = StringField('Last Name', validators=[DataRequired(),
                            Length(min=2, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('confirm_password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -29,13 +27,19 @@ class RegistrationTeacher(FlaskForm):
                            Length(min=2, max=15)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('confirm_password', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
 class Logout(FlaskForm):
     submit = SubmitField('Logout')
 
+class Forgotpass(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('submit')
+
+class Verify(FlaskForm):
+    verifyCode = StringField('code', validators=[DataRequired()])
+    submit = SubmitField('submit')
 
 class Student_SubjectForm(FlaskForm):
     subjectCode = StringField('Subject Code', validators=[DataRequired()])
