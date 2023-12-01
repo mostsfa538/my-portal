@@ -21,6 +21,7 @@ def home():
         return redirect('/login')
 
     first_name = ''
+    pfp = ''
     email = session['email']
     id = session['id']
     subs = []
@@ -71,9 +72,10 @@ def home():
 
     if role == 'student':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name FROM student WHERE id = (%s)", (id,))
+        cur.execute("SELECT first_name, profile_avatar FROM student WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
+        pfp = result[1]
 
         cur.execute(
             "SELECT sub_id FROM student_sub WHERE student_id = (%s)", (id,))
@@ -84,9 +86,10 @@ def home():
 
     elif role == 'teacher':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name FROM teacher WHERE id = (%s)", (id,))
+        cur.execute("SELECT first_name, profile_avatar FROM teacher WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
+        pfp = result[1]
 
         cur.execute(
             "SELECT sub_id FROM teacher_sub WHERE teacher_id = (%s)", (id,))
@@ -97,7 +100,8 @@ def home():
     return render_template('home.html', role=role, form=form,
                            message=message, submit=not submit,
                            title='Home Page',
-                           first_name=first_name, subs=subs)
+                           first_name=first_name,
+                           pfp_link=pfp, subs=subs)
 
 
 def get_subjects(subs_id):
