@@ -19,8 +19,8 @@ def home():
     successful = ('email' in session)
     if not successful:
         return redirect('/login')
-
     first_name = ''
+    pfp = ''
     email = session['email']
     id = session['id']
     subs = []
@@ -53,27 +53,46 @@ def home():
         elif role == 'teacher':
             subject_name = form.subjectName.data
             submitted_emails = [email.data for email in form.emails]
-            code = str(uuid.uuid4()).split('-')[0]
+            books = [book.data for book in form.books]
             cur = mysql.connection.cursor()
+            code = str(uuid.uuid4()).split('-')[0]
             cur.execute("INSERT INTO subject (name, code) VALUES (%s, %s)",
                         (subject_name, code))
             new_sub_id = cur.lastrowid
-            cur.execute("INSERT INTO teacher_sub VALUES (%s, %s)",
+            cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 1)",
                         (id, new_sub_id))
-            mysql.connection.commit()
+            for book in books:
+                book = convert_drive_link(book)
+                cur.execute("INSERT INTO book (link, sub_id) VALUES (%s, %s)", (book, new_sub_id))
+            for sec_email in submitted_emails:
+                cur.execute("SELECT id FROM teacher WHERE email = %s", (sec_email,))
+                result = cur.fetchone()
+                if not result:
+                    flash('Teacher Email was not found!', 'danger')
+                    submit = False
+                    break
+                elif sec_email == session['email']:
+                    flash("You can't add yourself", 'danger')
+                    submit = False
+                    break
+                sec_teacher = result[0]
+                cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 0)",
+                            (sec_teacher, new_sub_id))
             cur.close()
             print('name:', subject_name)
             print('emails:', submitted_emails)
         if submit:
+            mysql.connection.commit()
             session['message'] = 'Subject added successfully!'
             return redirect(url_for('home'))
     message = session.pop('message', None)
 
     if role == 'student':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name FROM student WHERE id = (%s)", (id,))
+        cur.execute("SELECT first_name, profile_avatar FROM student WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
+        pfp = result[1]
 
         cur.execute(
             "SELECT sub_id FROM student_sub WHERE student_id = (%s)", (id,))
@@ -84,9 +103,10 @@ def home():
 
     elif role == 'teacher':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name FROM teacher WHERE id = (%s)", (id,))
+        cur.execute("SELECT first_name, profile_avatar FROM teacher WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
+        pfp = result[1]
 
         cur.execute(
             "SELECT sub_id FROM teacher_sub WHERE teacher_id = (%s)", (id,))
@@ -97,7 +117,13 @@ def home():
     return render_template('home.html', role=role, form=form,
                            message=message, submit=not submit,
                            title='Home Page',
-                           first_name=first_name, subs=subs)
+                           first_name=first_name,
+                           pfp_link=pfp, subs=subs)
+
+
+def convert_drive_link(original_link):
+    modified_link = original_link.replace("/view", "/preview").replace("?usp=sharing", "")
+    return (modified_link)
 
 
 def get_subjects(subs_id):

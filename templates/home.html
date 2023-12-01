@@ -13,11 +13,13 @@
 		integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/switch_button.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/dark-light.css') }}">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
 		const Swal = require('sweetalert2')
 	</script>
-
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>	
 	<style>
 		.pfp {
 			width: 85%;
@@ -48,7 +50,7 @@
 			<ul class="navbar-nav ms-1">
 				<li class="nav-item d-none d-md-block mb-4 ms-2 mt-1">
 					<img class="img-fluid pfp"
-						src='https://avataaars.io/?avatarStyle=Circle&topType=ShortHairDreads02&accessoriesType=Round&hairColor=Auburn&facialHairType=BeardMajestic&facialHairColor=Auburn&clotheType=Hoodie&clotheColor=Gray01&eyeType=WinkWacky&eyebrowType=UpDown&mouthType=Tongue&skinColor=Brown'>
+							src="{{pfp_link}}">
 					</a>
 				</li>
 				<li class="nav-item ms-1 mb-2">
@@ -94,7 +96,7 @@
 </label>
 				</li>
 
-				<li class="nav-item d-none d-md-block  position-absolute bottom-0">
+				<li class="nav-item d-none d-md-block" style="transform: translateY(100%)">
 					<img src="{{ url_for('static', filename='images/sidebar_logo.png') }}" alt=""
 						class="img-fluid mb-5 ms-4" style="width: 60%;">
 				</li>
@@ -139,7 +141,7 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="addSubjectModalLabel">Modal title</h1>
+					<h1 class="modal-title fs-5 dark-light-modal" id="addSubjectModalLabel">Add Subject</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body dark-light-modal">
@@ -152,7 +154,7 @@
 					{% endfor %}
 					{% endif %}
 					{% endwith%}
-					<form method="POST" action="/home" novalidate>
+					<form method="POST" action="/home" novalidate id="addSubjectForm">
 						{{ form.hidden_tag() }}
 						{% if role == "student"%}
 						<div class="form-group mb-2">
@@ -178,6 +180,7 @@
 								<span>{{ error }}</span>
 								{% endfor %}
 							</div>
+							<script> document.getElementById('myButton').click();</script>
 							{% else %}
 							{{ form.subjectName(class="form-control", id='user-input') }}
 							{% endif %}
@@ -200,6 +203,24 @@
 						<button type="button" onclick="addEmailField()" class="btn btn-primary">Add Secondary
 							Teacher</button>
 						<br>
+							<div id="books-fields" class="form-group mb-2">
+							{% for book in form.books %}
+							{{ book.label(class="form-label-control") }}
+							{% if book.errors %}
+							{{ book(class="form-control is-invalid") }}
+							<div class="invalid-feedback">
+								{% for error in book.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ book(class="form-control") }}
+							{% endif %}
+							{% endfor %}
+						</div>
+						<button type="button" onclick="addBookField()" class="btn btn-primary">Add Books</button>
+						<br>
+
 						{% endif %}
 						{% if message %}
 						<script>
@@ -229,6 +250,7 @@
 		crossorigin="anonymous"></script>
 
 	<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/switch_button.js') }}"></script>
 
 	<script>
 		index = 1;
@@ -252,6 +274,28 @@
 			container.appendChild(input);
 			index += 1;
 		}
+		index_book = 1;
+		function addBookField() {
+			var container = document.getElementById('books-fields');
+
+			var label = document.createElement('label');
+			label.setAttribute('for', `books-${index_book}`);
+			label.textContent = `#${index_book} Google Drive Book link:`;
+			label.classList.add('form-label-control');
+
+			var input = document.createElement('input');
+			input.setAttribute('id', `books-${index_book}`);
+			input.setAttribute('name', `books-${index_book}`);
+			input.setAttribute('required', '');
+			input.setAttribute('type', 'text');
+			input.setAttribute('value', '');
+			input.classList.add('form-control');
+
+			container.appendChild(label);
+			container.appendChild(input);
+			index_book += 1;
+		}
+
 		document.getElementById('user-input').addEventListener('input', function () {
 			var inputValue = this.value.trim();
 			var submitBtn = document.getElementById('submit-btn');
@@ -262,7 +306,7 @@
 				submitBtn.setAttribute('disabled', 'disabled');
 			}
 		});
-	</script>
+		</script>
 
 	{% if submit%}
 	<script> document.getElementById('myButton').click();</script>

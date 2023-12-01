@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" href="../static/login.css">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/teacher_register.css') }}">
     <title>register for student</title>
 </head>
 <body>
@@ -17,7 +17,7 @@
             <div class="col-md-6 rounded-4 d-flex justify-content-center align-items-center flex-column left-box" style="background: #103cbe;">
 
                 <div class="featured-image mb-3">
-                    <img src="imagesit/wallpaperflare.com_wallpaper.jpg" class="img-fluid" style="width: 450px;">
+                    <img src="{{ url_for('static', filename='images/login_register.png') }}"" class="img-fluid" style="width: 450px;">
                 </div>
 
                 <p class="text-white fs-2" style="font-family: 'Courier New', Courier, monospace; font-weight: 600;">Be One Of Us!</p>
@@ -39,7 +39,7 @@
 					{% endfor %}
 					{% endif %}
 					{% endwith %}
-                    <form method="POST" action="/registerStudent" id="registerForm" novalidate>
+                    <form method="POST" action="/registerTeacher" id="registerForm" novalidate>
                         {{ form.hidden_tag() }}
                         {{ form.csrf_token }}
                       <div class="input-group mb-3">
@@ -85,6 +85,16 @@
                             {% endfor %}
                       </div>
                         <div class="input-group mb-3">
+                            {{ form.confirm_password(class="form-control form-control-lg bg-light fs-6",
+                          placeholder="confirm password") }}
+                      </div>
+
+                      <div class="error-message mb-2 text-danger" id="confirm_password-error">
+                          {% for error in form.confirm_password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                      </div>
+                        <div class="input-group mb-3">
                             {{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
                         </div>
                     </form>
@@ -92,6 +102,6 @@
             </div>
         </div>
     </div>
-    <script src="../static/login.js"></script>
+<!--    <script src="../static/teacher_register.js"></script>-->
 </body>
 </html>

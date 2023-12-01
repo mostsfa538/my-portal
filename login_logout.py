@@ -3,6 +3,8 @@ from flask import render_template, flash, redirect, session
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
+import random
+
 
 bcrypt = Bcrypt()
 
@@ -20,32 +22,47 @@ def register():
         date = '2004-01-05'
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash(
-            password).decode('utf-8')
-
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT email FROM student\
-                    WHERE email LIKE (%s)\
-                    UNION\
-                    SELECT email FROM teacher\
-                    WHERE email LIKE (%s)", (email, email))
-        existing_student = cur.fetchone()
-        cur.close()
-
-        if existing_student:
-            flash('Email already exists. Please choose a different email.',
+        confirm_password = form.confirm_password.data
+        if password != confirm_password:
+            flash('password NOT match.',
                   'danger')
         else:
+            hashed_password = bcrypt.generate_password_hash(
+                password).decode('utf-8')
+
             cur = mysql.connection.cursor()
-            cur.execute("INSERT INTO student (first_name, middle_name,\
-                        last_name, date_of_birth, email, password) "
-                        "VALUES (%s, %s, %s, %s, %s, %s)",
-                        (firstName, middleName, lastName, date,
-                         email, hashed_password))
-            mysql.connection.commit()
+            cur.execute("SELECT email FROM student\
+                        WHERE email LIKE (%s)\
+                        UNION\
+                        SELECT email FROM teacher\
+                        WHERE email LIKE (%s)", (email, email))
+            existing_student = cur.fetchone()
             cur.close()
-            # flash('Student information added successfully!', 'success')
-            return redirect("/login")
+
+            if existing_student:
+                flash('Email already exists. Please choose a different email.',
+                      'danger')
+            else:
+                male_avatars = ["Annie", "Harley", "Snowball", "Oreo",
+                                "Angel", "Leo", "Bob", "Buddy", "Tiger",
+                                "Bandit", "Cleo", "Simba", "Coco", "Rocky",
+                                "Simon"
+                                ]
+                female_avatars = ["Miss", "Kitty", "Salem", "Whiskers",
+                                  "Buster", "Sammy", "Jasper", "Daisy",
+                                  "Smokey", "Shadow"
+                                  ]
+                avatar = f'https://api.dicebear.com/7.x/adventurer/svg?seed={random.choice(male_avatars)}'
+                cur = mysql.connection.cursor()
+                cur.execute("INSERT INTO student (first_name, middle_name,\
+                            last_name, date_of_birth, email, password,\
+                            profile_avatar)"
+                            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                            (firstName, middleName, lastName, date,
+                             email, hashed_password, avatar))
+                mysql.connection.commit()
+                cur.close()
+                return redirect("/login")
 
     return render_template("registerStudent.html", form=form)
 
@@ -61,30 +78,34 @@ def registerTeacher():
         date = '2004-01-5'
         email = form.email.data
         password = form.password.data
-        hashed_password = bcrypt.generate_password_hash(
-            password).decode('utf-8')
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT email FROM student\
-                    WHERE email LIKE (%s)\
-                    UNION\
-                    SELECT email FROM teacher\
-                    WHERE email LIKE (%s)", (email, email))
-        existing_teacher = cur.fetchone()
-        cur.close()
-
-        if existing_teacher:
-            flash('Email already registered. Please login.', 'danger')
-            return redirect("login")
+        confirm_password = form.confirm_password.data
+        if password != confirm_password:
+            flash('password NOT match.',
+                  'danger')
         else:
+            hashed_password = bcrypt.generate_password_hash(
+                password).decode('utf-8')
             cur = mysql.connection.cursor()
-            cur.execute(
-                "INSERT INTO teacher (first_name, last_name, date_of_birth,\
-                email, password) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (firstName, lastName, date, email, hashed_password))
-            mysql.connection.commit()
+            cur.execute("SELECT email FROM student\
+                        WHERE email LIKE (%s)\
+                        UNION\
+                        SELECT email FROM teacher\
+                        WHERE email LIKE (%s)", (email, email))
+            existing_teacher = cur.fetchone()
             cur.close()
-            return redirect("/login")
+
+            if existing_teacher:
+                flash('Email already registered. Please login.', 'danger')
+            else:
+                cur = mysql.connection.cursor()
+                cur.execute(
+                    "INSERT INTO teacher (first_name, last_name, date_of_birth,\
+                    email, password) "
+                    "VALUES (%s, %s, %s, %s, %s)",
+                    (firstName, lastName, date, email, hashed_password))
+                mysql.connection.commit()
+                cur.close()
+                return redirect("/login")
 
     return render_template("registerTeacher.html", form=form)
 
