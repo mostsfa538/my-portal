@@ -19,7 +19,7 @@
 				style="background: #103cbe;">
 
 				<div class="featured-image mb-3">
-					<img src="imagesit/wallpaperflare.com_wallpaper.jpg" class="img-fluid" style="width: 450px;">
+					<img src="{{ url_for('static', filename='images/login_register.png') }}"" class="img-fluid" style="width: 450px;">
 				</div>
 				<p class="text-white fs-2" style="font-family: 'Courier New', Courier, monospace; font-weight: 600;">Be
 					Verified</p>
@@ -89,7 +89,7 @@
 							{{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
 						</div>
 						<div class="input-group mb-3">
-							<button class="btn btn-lg btn-light w-100 fs-6"><img src="imagesit/google.png"
+							<button class="btn btn-lg btn-light w-100 fs-6"><img src="{{ url_for('static', filename='images/google.png') }}""
 									style="width:20px" class="me-2"><small>Sign In with Google</small></button>
 						</div>
 						<div class="row">
