@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FieldList
-from wtforms.validators import DataRequired, Length, Email, Optional
+from wtforms.validators import DataRequired, Length, Email, Optional, URL
 
 
 class RegistrationStudent(FlaskForm):
@@ -45,5 +45,8 @@ class Teacher_SubjectForm(FlaskForm):
     subjectName = StringField('Subject Name', validators=[DataRequired()])
     emails = FieldList(StringField('Teacher Email',
                        validators=[Email(), Optional()]),
+                       min_entries=0)
+    books = FieldList(StringField('Google Drive Book link',
+                       validators=[Optional(), URL()]),
                        min_entries=0)
     submit = SubmitField('Submit')
