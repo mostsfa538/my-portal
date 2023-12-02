@@ -27,25 +27,55 @@
 						<h2>Reset Your Password</h2>
 						<p>Enter your new password below.</p>
 					</div>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">
+						{{ message }}
+					</div>
+					{% endfor %}
+					{% endif %}
+					{% endwith %}
 					<form id="resetPasswordForm" action="/reset_pass" method="POST">
+						{{ form.hidden_tag() }}
+						{{ form.csrf_token }}
 						<div class="input-group mb-3">
-							<input type="password" class="form-control form-control-lg bg-light fs-6"
-								placeholder="New Password" name="newPassword">
+							{% if form.password.errors %}
+							{{ form.password(class="form-control form-control-lg bg-light fs-6 is-invalid",
+							placeholder="password") }}
+							<div class="invalid-feedback">
+								{% for error in form.password.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ form.password(class="form-control form-control-lg bg-light fs-6",
+							placeholder="password") }}
+							{% endif %}
 						</div>
-						<div class="error-message mb-2 text-danger" id="new-password-error"></div>
-						<div class="input-group mb-3">
-							<input type="password" class="form-control form-control-lg bg-light fs-6"
-								placeholder="Confirm Password" name="confirmPassword">
+						<div class="input-group mb-1">
+							{%if form.confrimPassword.errors%}
+							{{ form.confrimPassword(class="form-control form-control-lg bg-light fs-6 is-invalid",
+							placeholder="confrim Password")}}
+							<div class="invalid-feedback">
+								{% for error in form.confrimPassword.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ form.confrimPassword(class="form-control form-control-lg bg-light fs-6",
+							placeholder="confrim Password")}}
+							{% endif %}
 						</div>
-						<div class="error-message mb-2 text-danger" id="confirm-password-error"></div>
 						<div class="input-group mb-3">
-							<button type="submit" class="btn btn-lg btn-primary w-100 fs-6">Reset Password</button>
+							{{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
 						</div>
 					</form>
 				</div>
 			</div>
 		</div>
 	</div>
+	<script src="../static/reset_pass.js"></script>
 </body>
 
 </html>

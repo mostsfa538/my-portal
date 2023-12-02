@@ -154,3 +154,14 @@ CREATE TABLE subject_ann_chat (
 	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE,
     FOREIGN KEY (teacher_id) REFERENCES teacher(id)
 );
+
+
+CREATE TABLE chat_messages (
+	id INT  PRIMARY KEY AUTO_INCREMENT,
+    sub_id INT,
+    user_id INT,
+    role varchar(15),
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE
+);

@@ -13,7 +13,13 @@ def subject_page(code):
     id = session['id']
     submit = True
     role = session['role']
-    return render_template('subject.html', role=role, code=code)
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {id}")
+    result = cur.fetchone()
+    pfp = result[0]
+    cur.close()
+    return render_template('subject.html', role=role, code=code, pfp_link=pfp)
 
 
 @app.route("/subject/<string:code>/chat", methods=['GET'])
