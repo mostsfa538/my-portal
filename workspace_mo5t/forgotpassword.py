@@ -1,16 +1,18 @@
-from form import Forgotpass, Verify
+from form import Forgotpass, Verify, reserPass
 from flask import render_template, flash, redirect, session, request
 from DB_connect import mysql
 from DB_connect import app
 from flask_mail import Mail, Message
+from flask_bcrypt import Bcrypt
 import random
 import string
 
+bcrypt = Bcrypt()
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'mlord62716@gmail.com'
-app.config['MAIL_PASSWORD'] = 'aszc mdno'
+app.config['MAIL_PASSWORD'] = ''
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -18,7 +20,6 @@ mail = Mail(app)
 
 
 def generate_random_code(length=6):
-    """Generate a random code with the specified length."""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for i in range(length))
 
@@ -58,16 +59,15 @@ def forgotpassword():
 
 @app.route('/verify_code', methods=['GET', 'POST'])
 def verify_code():
-    form = Verify()
     email = session.get('temp_mail', None)
     if not email:
         return redirect('/login')
+    form = Verify()
     if form.validate_on_submit():
         user_code = form.verifyCode.data
         if request.method == 'POST':
             code = session.get('code', None)
             if code and user_code and user_code == code:
-                session.pop('temp_mail', None)
                 return redirect('/reset_pass')
         else:
             flash('Invalid verification code. Please try again.')
@@ -76,4 +76,36 @@ def verify_code():
 
 @app.route('/reset_pass', methods=['GET', 'POST'])
 def reset_pass():
-    return render_template('reset_pass.html')
+    email = session.get('temp_mail', None)
+    if not email:
+        return redirect('/login')
+
+    form = reserPass()
+    if form.validate_on_submit():
+        password = form.password.data
+        confirmPassword = form.confrimPassword.data
+
+        if password and confirmPassword and password == confirmPassword:
+            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+            cur = mysql.connection.cursor()
+
+            cur.execute("SELECT email FROM student WHERE email LIKE %s", (email,))
+            exist_student = cur.fetchone()
+
+            if exist_student:
+                cur.execute("UPDATE student SET password = %s WHERE email LIKE %s", (hashed_password, email))
+            else:
+                cur.execute("UPDATE teacher SET password = %s WHERE email LIKE %s", (hashed_password, email))
+
+            mysql.connection.commit()
+            cur.close()
+
+            session.pop('temp_mail', None)
+            flash("Password successfully changed.")
+            return redirect('/login')
+
+        else:
+            flash("Passwords do not match.")
+
+    return render_template('reset_pass.html', form=form)

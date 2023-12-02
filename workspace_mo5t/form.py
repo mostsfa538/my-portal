@@ -38,13 +38,21 @@ class VerifyRegister(FlaskForm):
 class Logout(FlaskForm):
     submit = SubmitField('Logout')
 
+
+class reserPass(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    confrimPassword = PasswordField('confrim password', validators=[DataRequired()])
+    submit = SubmitField('submit')
+
 class Forgotpass(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('submit')
 
+
 class Verify(FlaskForm):
     verifyCode = StringField('code', validators=[DataRequired()])
     submit = SubmitField('submit')
+
 
 class Student_SubjectForm(FlaskForm):
     subjectCode = StringField('Subject Code', validators=[DataRequired()])
