@@ -45,7 +45,7 @@ def register():
             cur.close()
             code = generate_random_code()
             session['code'] = code
-            session['email'] = email
+            session['temp_mail'] = email
             msg = Message(
                 'Verification Code',
                 sender='my-portal@gmail.com',
@@ -97,7 +97,7 @@ def registerTeacher():
             cur.close()
             code = generate_random_code()
             session['code'] = code
-            session['email'] = email
+            session['temp_mail'] = email
             msg = Message(
                 'Verification Code',
                 sender='my-portal@gmail.com',
@@ -162,12 +162,16 @@ def logins():
 
 @app.route('/verifyRegister', methods=['GET', 'POST'])
 def verifyCode():
+    email = session.get('temp_mail', None)
+    if not email:
+        return redirect('/login')
     form = VerifyRegister()
     if form.validate_on_submit():
         user_code = form.verification_code.data
-        email = session.get('email', None)
+        print(email)
         if request.method == 'POST':
-            code = session.get('verification_code', None)
+            code = session.get('code', None)
+            print(code, user_code)
             if code and user_code and user_code == code:
                 cur = mysql.connection.cursor()
                 cur.execute("""
@@ -190,7 +194,9 @@ def verifyCode():
                     cur.execute(f"UPDATE {role} SET email_verified = 1 WHERE email LIKE %s", (email,))
                     mysql.connection.commit()
                     cur.close()
-                    session.pop('verification_code', None)
+                    session.pop('code', None)
+                    session.pop('temp_mail', None)
+
                     return redirect('/home')
 
         else:
