@@ -1,13 +1,25 @@
 {% extends "subject.html"%}
 {% block subject_page%}
-<div class="h-100 col" style="background-color: #1a1a1a;">
+<div class="h-100 col">
 	<main class="content">
 		<div class="container p-0">
 			<div class="card">
 				<div class="row g-0">
-					<div class="col">
+					<div class="col-12 col-lg-7 col-xl-9">
 						<div class="position-relative">
 							<div class="chat-messages p-4" id="chat-container">
+								<div class="chat-message-right pb-4">
+									<div>
+										<img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+											class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+										<div class="text-muted small text-nowrap mt-2">2:33 am</div>
+									</div>
+									<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+										<div class="font-weight-bold mb-1">You</div>
+										Lorem ipsum dolor sit amet, vis erat denique in, dicunt prodesset te
+										vix.
+									</div>
+								</div>
 								<div class="chat-message-right mb-4">
 									<div>
 										<img src="https://bootdey.com/img/Content/avatar/avatar1.png"
@@ -20,6 +32,7 @@
 										vix.
 									</div>
 								</div>
+
 								<div class="chat-message-left pb-4">
 									<div>
 										<img src="https://bootdey.com/img/Content/avatar/avatar3.png"
@@ -34,60 +47,24 @@
 								</div>
 							</div>
 						</div>
-						<div class="flex-grow-0 py-3 px-4 border-top chat-send">
+
+						<div class="flex-grow-0 py-3 px-4 border-top">
 							<form id="chat-form">
 								<div class="input-group">
 									<input type="text" required id="message" class="form-control"
 										placeholder="Type your message">
-									<input type="submit" class="btn btn-primary">
+									<input type="submit" class="btn btn-primary"="Send Message">
 								</div>
 							</form>
+
 						</div>
+
 					</div>
 				</div>
 			</div>
 		</div>
 	</main>
 </div>
-<script>
-	function scrollToBottom()
-	{
-		let chatContainer = $('#chat-container');
-		chatContainer.scrollTop(chatContainer.prop('scrollHeight'));
-	}
 
-	$(document).ready(function ()
-	{
-		function fetchMessages()
-		{
-			$.get("/subject/{{ code }}/chat/api", function (data)
-			{
-				$("#chat-container").html(data);
-				scrollToBottom();
-			});
-		}
-
-		fetchMessages();
-
-		setInterval(fetchMessages, 5000);
-
-		$("#chat-form").submit(function (event)
-		{
-			event.preventDefault();
-
-			let message = $("#message").val();
-			scrollToBottom();
-			$.post("/subject/{{ code }}/chat/api/send", { message: message }, function ()
-			{
-				$("#message").val("");
-
-				fetchMessages();
-			});
-
-		});
-	});
-
-
-</script>
 
 {%endblock subject_page%}

@@ -1,4 +1,3 @@
-
 .dark-light {
     background-color: #3663fc;
     color: #ffffff;
@@ -13,6 +12,26 @@ body.dark-mode .dark-light,
 body.dark-mode .dark-light-card {
     background-color: #673ab7;
 }
+
+body.dark-mode .chat-send,
+body.dark-mode .chat-send *,
+body.dark-mode .chat-messages {
+    background-color: #1a1a1a !important;
+    color: white;
+}
+
+body.dark-mode .chat-messages .single-message {
+    background-color: grey !important;
+    color: white;
+}
+
+body .chat-messages .single-message {
+    background-color: #dfd9d9 !important;
+    color: black;
+}
+
+
+
 /* body.dark-mode	.dark-light-card p{ */
 /* 	color: white !important; */
 /* } */
