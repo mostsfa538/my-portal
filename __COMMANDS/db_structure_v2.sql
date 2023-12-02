@@ -140,6 +140,7 @@ CREATE TABLE quiz(
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     start_time TIMESTAMP NOT NULL,
     duration INT NOT NULL,
+	link varchar(256),
     sub_id INT NOT NULL,
     FOREIGN KEY (sub_id) REFERENCES subject(id)
 );
