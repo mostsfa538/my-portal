@@ -1,9 +1,9 @@
-from form import RegistrationStudent, Login, RegistrationTeacher
-from flask import render_template, flash, redirect, session
+from form import RegistrationStudent, Login, RegistrationTeacher, VerifyRegister
+from flask import render_template, flash, redirect, session, request
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
-from forgotpassword import forgotpassword
+from forgotpassword import *
 bcrypt = Bcrypt()
 
 @app.route('/registerStudent', methods=['GET', 'POST'])
@@ -43,10 +43,23 @@ def register():
                          email, hashed_password))
             mysql.connection.commit()
             cur.close()
-            return redirect("/login")
+            code = generate_random_code()
+            session['code'] = code
+            session['email'] = email
+            msg = Message(
+                'Verification Code',
+                sender='my-portal@gmail.com',
+                recipients=[email]
+            )
+            msg.body = f'Your verification code is: {code}'
+            mail.send(msg)
+            return redirect('/verifyRegister')
 
     return render_template("registerStudent.html", form=form)
 
+def generate_random_code(length=6):
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for i in range(length))
 
 @app.route('/registerTeacher', methods=['GET', 'POST'])
 def registerTeacher():
@@ -82,7 +95,18 @@ def registerTeacher():
                 (firstName, lastName, date, email, hashed_password))
             mysql.connection.commit()
             cur.close()
-            return redirect("/login")
+            code = generate_random_code()
+            session['code'] = code
+            session['email'] = email
+            msg = Message(
+                'Verification Code',
+                sender='my-portal@gmail.com',
+                recipients=[email]
+            )
+
+            msg.body = f'Your verification code is: {code}'
+            mail.send(msg)
+            return redirect('/verifyRegister')
 
     return render_template("registerTeacher.html", form=form)
 
@@ -136,13 +160,49 @@ def logins():
     return render_template('login.html', form=form)
 
 
+@app.route('/verifyRegister', methods=['GET', 'POST'])
+def verifyCode():
+    form = VerifyRegister()
+    if form.validate_on_submit():
+        user_code = form.verification_code.data
+        email = session.get('email', None)
+        if request.method == 'POST':
+            code = session.get('verification_code', None)
+            if code and user_code and user_code == code:
+                cur = mysql.connection.cursor()
+                cur.execute("""
+                    SELECT %s as role
+                    FROM student
+                    WHERE email = %s
+                    UNION
+                    SELECT %s as role
+                    FROM teacher
+                    WHERE email = %s
+                """, ('student', email, 'teacher', email))
+
+                column_names = [column[0] for column in cur.description]
+                result = cur.fetchone()
+                cur.close()
+
+                if result:
+                    role = result[0]
+                    cur = mysql.connection.cursor()
+                    cur.execute(f"UPDATE {role} SET email_verified = 1 WHERE email LIKE %s", (email,))
+                    mysql.connection.commit()
+                    cur.close()
+                    session.pop('verification_code', None)
+                    return redirect('/home')
+
+        else:
+            flash('Invalid verification code. Please try again.')
+    return render_template('verifyRegister.html', form=form)
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop("email", None)
     session.pop("id", None)
     session.pop("role", None)
     return redirect('/login')
-
 
 
 @app.route('/path')

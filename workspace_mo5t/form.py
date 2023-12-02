@@ -30,6 +30,11 @@ class RegistrationTeacher(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class VerifyRegister(FlaskForm):
+    verification_code = StringField('Verification Code', validators=[DataRequired()])
+    submit = SubmitField('submit')
+
+
 class Logout(FlaskForm):
     submit = SubmitField('Logout')
 
