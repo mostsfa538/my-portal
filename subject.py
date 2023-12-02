@@ -79,7 +79,7 @@ def get_chat_messages(code):
             result = cur.fetchone()
             chat_messages[index].append(str(result[0]))
             chat_messages[index].append(str(result[1]))
-            print(result)
+            # print(result)
         else:
             chat_messages[index].append('left')
             cur.execute(
@@ -87,13 +87,13 @@ def get_chat_messages(code):
             result = cur.fetchone()
             chat_messages[index].append(str(result[0]))
             chat_messages[index].append(str(result[1]))
-            print('else:', message[0])
+            # print('else:', message[0])
 
     cur.execute(
         f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {user_id}")
     result = cur.fetchone()
     pfp = result[0]
-    print(chat_messages)
+    # print(chat_messages)
     return render_template('chat_messages.html', chat_messages=chat_messages, pfp=pfp)
 
 
@@ -106,5 +106,5 @@ def get_chat_messages(code):
         "SELECT user_id, message, timestamp, role FROM chat_messages WHERE sub_id = %s ORDER BY timestamp ASC", (sub_id,))
     chat_messages = cur.fetchall()
     cur.close()
-    print(sub_id)
+    # print(sub_id)
     return (chat_messages)

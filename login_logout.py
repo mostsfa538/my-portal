@@ -83,7 +83,7 @@ def registerTeacher():
     if 'email' in session:
         return redirect("/home")
     if form.validate_on_submit():
-        print('yes')
+        # print('yes')
         firstName = form.firstName.data
         lastName = form.lastName.data
         date = '2004-01-5'
@@ -163,7 +163,7 @@ def logins():
                 session['email'] = email
                 session['id'] = id
                 session['role'] = role
-                print(f'{session}')
+                # print(f'{session}')
                 return redirect("/")
             else:
                 flash('Login Unsuccessful.\n\
@@ -185,10 +185,10 @@ def verifyCode():
     form = VerifyRegister()
     if form.validate_on_submit():
         user_code = form.verification_code.data
-        print(email)
+        # print(email)
         if request.method == 'POST':
             code = session.get('code', None)
-            print(code, user_code)
+            # print(code, user_code)
             if code and user_code and user_code == code:
                 cur = mysql.connection.cursor()
                 cur.execute("""

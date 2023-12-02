@@ -79,8 +79,8 @@ def home():
                 cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 0)",
                             (sec_teacher, new_sub_id))
             cur.close()
-            print('name:', subject_name)
-            print('emails:', submitted_emails)
+            # print('name:', subject_name)
+            # print('emails:', submitted_emails)
         if submit:
             mysql.connection.commit()
             session['message'] = 'Subject added successfully!'
@@ -148,7 +148,7 @@ def get_subjects(subs_id):
             }
             subs.append(sub_dict)
     cur.close()
-    print(subs)
+    # print(subs)
     return (subs)
 
 
