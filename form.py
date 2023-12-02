@@ -50,3 +50,12 @@ class Teacher_SubjectForm(FlaskForm):
                        validators=[Optional(), URL()]),
                        min_entries=0)
     submit = SubmitField('Submit')
+
+
+class Forgotpass(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('submit')
+
+class Verify(FlaskForm):
+    verifyCode = StringField('code', validators=[DataRequired()])
+    submit = SubmitField('submit')

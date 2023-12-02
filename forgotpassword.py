@@ -3,22 +3,25 @@ from flask import render_template, flash, redirect, session, request
 from DB_connect import mysql
 from DB_connect import app
 from flask_mail import Mail, Message
-import random, string
+import random
+import string
 
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'mlord62716@gmail.com'
-app.config['MAIL_PASSWORD'] = 'wmvq pchd oziq'
+app.config['MAIL_PASSWORD'] = 'wmvq pchd oziq kgmv'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
 mail = Mail(app)
 
+
 def generate_random_code(length=6):
     """Generate a random code with the specified length."""
     characters = string.ascii_letters + string.digits
     return ''.join(random.choice(characters) for i in range(length))
+
 
 @app.route('/forgotpass', methods=['GET', 'POST'])
 def forgotpassword():
@@ -51,46 +54,6 @@ def forgotpassword():
             flash('Email is not exist')
 
     return render_template("forgotpass.html", form=form)
-
-@app.route('/verify_code', methods=['GET', 'POST'])
-def verify_code():
-    form = Verify()
-    if form.validate_on_submit():
-        user_code = form.verifyCode.data
-        email = session.get('email', None)
-        if request.method == 'POST':
-            code = session.get('verification_code', None)
-            if code and user_code and user_code == code:
-                cur = mysql.connection.cursor()
-                cur.execute("""
-                    SELECT %s as role
-                    FROM student
-                    WHERE email = %s
-                    UNION
-                    SELECT %s as role
-                    FROM teacher
-                    WHERE email = %s
-                """, ('student', email, 'teacher', email))
-
-                column_names = [column[0] for column in cur.description]
-                result = cur.fetchone()
-                cur.close()
-
-                if result:
-                    role = result[0]
-                    cur = mysql.connection.cursor()
-                    cur.execute(f"UPDATE {role} SET email_verified = 1 WHERE email LIKE %s", (email,))
-                    mysql.connection.commit()
-                    cur.close()
-                    session.pop('verification_code', None)
-                    return render_template('reset_pass.html')
-                else:
-                    flash('Email does not exist!', 'danger')
-
-        else:
-            flash('Invalid verification code. Please try again.')
-
-    return render_template('verify_code.html', form=form)
 
 
 @app.route('/reset_pass', methods=['GET', 'POST'])

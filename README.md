@@ -12,6 +12,7 @@
 ### Requirements
 - python
     - flask
+    - flask_mail
     - flask_wtf
     - flask_login
     - flask_bcrypt
