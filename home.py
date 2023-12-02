@@ -63,9 +63,11 @@ def home():
                         (id, new_sub_id))
             for book in books:
                 book = convert_drive_link(book)
-                cur.execute("INSERT INTO book (link, sub_id) VALUES (%s, %s)", (book, new_sub_id))
+                cur.execute(
+                    "INSERT INTO book (link, sub_id) VALUES (%s, %s)", (book, new_sub_id))
             for sec_email in submitted_emails:
-                cur.execute("SELECT id FROM teacher WHERE email = %s", (sec_email,))
+                cur.execute(
+                    "SELECT id FROM teacher WHERE email = %s", (sec_email,))
                 result = cur.fetchone()
                 if not result:
                     flash('Teacher Email was not found!', 'danger')
@@ -79,8 +81,6 @@ def home():
                 cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 0)",
                             (sec_teacher, new_sub_id))
             cur.close()
-            # print('name:', subject_name)
-            # print('emails:', submitted_emails)
         if submit:
             mysql.connection.commit()
             session['message'] = 'Subject added successfully!'
@@ -89,7 +89,8 @@ def home():
 
     if role == 'student':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name, profile_avatar FROM student WHERE id = (%s)", (id,))
+        cur.execute(
+            "SELECT first_name, profile_avatar FROM student WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
         pfp = result[1]
@@ -103,7 +104,8 @@ def home():
 
     elif role == 'teacher':
         cur = mysql.connection.cursor()
-        cur.execute("SELECT first_name, profile_avatar FROM teacher WHERE id = (%s)", (id,))
+        cur.execute(
+            "SELECT first_name, profile_avatar FROM teacher WHERE id = (%s)", (id,))
         result = cur.fetchone()
         first_name = result[0]
         pfp = result[1]
@@ -122,7 +124,8 @@ def home():
 
 
 def convert_drive_link(original_link):
-    modified_link = original_link.replace("/view", "/preview").replace("?usp=sharing", "")
+    modified_link = original_link.replace(
+        "/view", "/preview").replace("?usp=sharing", "")
     return (modified_link)
 
 
@@ -148,14 +151,12 @@ def get_subjects(subs_id):
             }
             subs.append(sub_dict)
     cur.close()
-    # print(subs)
     return (subs)
 
 
 @app.route('/')
 def root():
     successful = ('email' in session)
-    # print(successful)
     if successful:
         return redirect('/home')
     else:

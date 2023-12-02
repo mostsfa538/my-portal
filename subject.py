@@ -11,7 +11,6 @@ def subject_page(code):
     first_name = ''
     email = session['email']
     id = session['id']
-    submit = True
     role = session['role']
     cur = mysql.connection.cursor()
     cur.execute(
@@ -19,7 +18,34 @@ def subject_page(code):
     result = cur.fetchone()
     pfp = result[0]
     cur.close()
-    return render_template('subject.html', role=role, code=code, pfp_link=pfp)
+    return render_template('subject.html', role=role, code=code, pfp_link=pfp, main_page=1)
+
+
+@app.route("/subject/<string:code>/book", methods=['GET'])
+def book_page(code):
+    successful = ('email' in session)
+    if not successful:
+        return redirect('/login')
+    first_name = ''
+    email = session['email']
+    id = session['id']
+    role = session['role']
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {id}")
+    result = cur.fetchone()
+    pfp = result[0]
+    cur.execute(
+        f"SELECT id FROM `subject` WHERE `code` = '{code}'")
+    result = cur.fetchone()[0]
+    cur.execute(
+        f"SELECT link FROM book WHERE sub_id = {result}")
+    result = cur.fetchall()
+    links = result if result else []
+    links = [list(link)[0] for link in links]
+    cur.close()
+    print(result)
+    return render_template('book.html', role=role, code=code, pfp_link=pfp, links=links)
 
 
 @app.route("/subject/<string:code>/chat", methods=['GET'])
@@ -71,29 +97,26 @@ def get_chat_messages(code):
     user_id = session['id']
     cur = mysql.connection.cursor()
     for index, message in enumerate(chat_messages):
-        # print(session['id'], f'==>{message[0]}<===')
         if str(message[0]) == str(session['id']):
             chat_messages[index].append('right')
             cur.execute(
                 f"SELECT profile_avatar, first_name FROM `{session['role']}` WHERE id = {user_id}")
             result = cur.fetchone()
+            name = f"{''if session['role'] == 'student' else 'Dr.'}{result[1]}"
             chat_messages[index].append(str(result[0]))
-            chat_messages[index].append(str(result[1]))
-            # print(result)
+            chat_messages[index].append(str(name))
         else:
             chat_messages[index].append('left')
             cur.execute(
                 f"SELECT profile_avatar, first_name FROM `{message[3]}` WHERE id = %s", (message[0],))
             result = cur.fetchone()
+            name = f"{''if message[3] == 'student' else 'Dr.'}{result[1]}"
             chat_messages[index].append(str(result[0]))
-            chat_messages[index].append(str(result[1]))
-            # print('else:', message[0])
-
+            chat_messages[index].append(str(name))
     cur.execute(
         f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {user_id}")
     result = cur.fetchone()
     pfp = result[0]
-    # print(chat_messages)
     return render_template('chat_messages.html', chat_messages=chat_messages, pfp=pfp)
 
 
