@@ -3,6 +3,7 @@ from flask_bcrypt import Bcrypt
 from login_logout import *
 from home import *
 from subject import *
+from news import *
 
 bcrypt = Bcrypt(app)
 

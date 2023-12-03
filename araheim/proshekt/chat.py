@@ -1,4 +1,4 @@
-from flask import Flask , render_template
+from flask import Flask , render_template, redirect, session
 from flask_mysqldb import MySQL
 
 app = Flask(__name__, static_url_path='/static') 
@@ -7,8 +7,15 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'my_portal'
 mysql = MySQL(app)
-@app.route('/')
-def displayAnnouncementChat():
+
+
+
+@app.route('/subject/<string:code>/news')
+def displayAnnouncementChat(code):
+    # if email not in session.keys():
+        # return redirect('/login')
+
+
     # Names = mysql.connection.cursor()
     # Messages = mysql.connection.cursor()
     # Names.execute(f"SELECT first_name FROM  teacher INNER JOIN subject_ann_chat ON teacher.id = subject_ann_chat.messageSender where subject = {1}")
@@ -19,6 +26,8 @@ def displayAnnouncementChat():
     # Messages.close()
     # data_dict = [{'name': name, 'message': message} for name, message in zip(namesData, messagesData)]
     return render_template('index.html', data = {})
+
+
 def displayGeneralChat():
     pass
 if __name__ == '__main__':
