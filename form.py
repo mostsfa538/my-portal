@@ -71,3 +71,8 @@ class VerifyRegister(FlaskForm):
     verification_code = StringField(
         'Verification Code', validators=[DataRequired()])
     submit = SubmitField('submit')
+
+
+class SendNews(FlaskForm):
+    message = StringField('Send Message', validators=[DataRequired()])
+    submit = SubmitField('Send')

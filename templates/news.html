@@ -1,12 +1,38 @@
-{% extends "subject.html"%}
-{% block subject_page%}
-
-
-<div class="h-100 col"">
-	content here
+{% extends "subject.html"%} {% block subject_page%} {% for message in messages
+%}
+<div class="row chat-messages p-5">
+	<div class="chat-message-left pb-4">
+		<div>
+			<img src="{{message[3]}}" class="rounded-circle mr-1" alt="PFP" width="50" height="50" />
+			<div class="text-muted small text-nowrap mt-2">2022-03-05 15:15:60</div>
+		</div>
+		<div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 single-message ms-2 me-2">
+			<div class="font-weight-bold mb-1 fw-bold fs-6 text-start">
+				{{message[2]}}
+			</div>
+			{{message[0]}}
+		</div>
+	</div>
 </div>
+<form method="POST" action="/subject/{{code}}/news" novalidate>
+	{{ form.hidden_tag() }}
 
-
-{%endblock subject_page%}
-
-
+	<div class="input-group mb-3">
+		{% if form.message.errors %}
+		{{ form.message(class="form-control form-control-lg bg-light fs-6 is-invalid",
+		placeholder="message address") }}
+		<div class="invalid-feedback">
+			{% for error in form.message.errors %}
+			<span>{{ error }}</span>
+			{% endfor %}
+		</div>
+		{% else %}
+		{{ form.message(class="form-control form-control-lg bg-light fs-6",
+		placeholder="message address") }}
+		{% endif %}
+	</div>
+	<div class="input-group mb-3">
+		{{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
+	</div>
+</form>
+{% endfor %} {%endblock subject_page%}
