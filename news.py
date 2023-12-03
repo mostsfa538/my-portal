@@ -20,9 +20,9 @@ def news_page(code):
     pfp = result[0]
     cur.execute(
         f"SELECT id FROM `subject` WHERE `code` = '{code}'")
-    result = cur.fetchone()[0]
+    sub_id = cur.fetchone()[0]
     cur.execute(
-        f"SELECT `message` , `teacher_id` FROM subject_ann_chat WHERE sub_id = {result}")
+        f"SELECT `message` , `teacher_id` FROM subject_ann_chat WHERE sub_id = {sub_id}")
     result = cur.fetchall()
     messages = result if result else []
     messages = [list(message) for message in messages]
@@ -37,4 +37,11 @@ def news_page(code):
     form = SendNews()
     if form.validate_on_submit():
         message = form.message.data
+        cursor= mysql.connection.cursor()
+        cursor.execute(
+            f"INSERT INTO `subject_ann_chat` (message,teacher_id,sub_id) VALUES ('{message}' ,{session['id']},{sub_id})"
+        )
+        mysql.connection.commit()
+        cursor.close()
+        return redirect(f"/subject/{code}/news")
     return render_template('news.html', role=role, code=code, pfp_link=pfp, messages=messages, form = form)

@@ -1,5 +1,15 @@
-{% extends "subject.html"%} {% block subject_page%} {% for message in messages
-%}
+{% extends "subject.html"%} {% block subject_page%}
+<div>{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+	{% for category, message in messages %}
+	<div class="alert alert-{{ category }}">
+		{{ message }}
+	</div>
+	{% endfor %}
+	{% endif %}
+	{% endwith%}
+</div>
+{% for message in messages%}
 <div class="row chat-messages p-5">
 	<div class="chat-message-left pb-4">
 		<div>
@@ -14,6 +24,8 @@
 		</div>
 	</div>
 </div>
+{% endfor %}
+{% if role == "teacher" %}
 <form method="POST" action="/subject/{{code}}/news" novalidate>
 	{{ form.hidden_tag() }}
 
@@ -35,4 +47,5 @@
 		{{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
 	</div>
 </form>
-{% endfor %} {%endblock subject_page%}
+{% endif%}
+{%endblock subject_page%}
