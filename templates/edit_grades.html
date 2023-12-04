@@ -23,15 +23,24 @@
 			<nav class="navbar bg-body-tertiary bg-dark ">
 				<div class="container-fluid">
 					<a class="navbar-brand text-light fs-2">MyPotral Grade System</a>
-					<form class="d-flex">
+					<form class="d-flex" enctype="multipart/form-data" action="/subject/{{ code }}/grades/api/upload"
+						id="uploadFileForm" method="POST">
 						<!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
 						<!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
 						<a class="btn btn-outline-primary p-2 ps-4 pe-4 m-2 text-light"
 							href="/subject/{{ code }}/grades/api/download"> Download</a>
-						<button class="btn btn-outline-info p-2 ps-4 pe-4 m-2 text-light"> Upload
-						</button>
+
+						<!-- <label for="uploadFileInput" class="text-light btn btn-outline-info">Upload</label>
+						<input type="file" name="file" accept=".csv" id="uploadFileInput">
+						<button class="btn btn-outline-info p-2 ps-4 pe-4 m-2" id="uploadFile">Upload</button> -->
+						<label for="uploadFile" class="btn btn-outline-info p-2 ps-4 pe-4 m-2 text-light">Upload
+							<input type="file" id="uploadFile" name="file" accept=".csv" required class="btn">
+						</label>
+						<button type="submit" id="submitBtn" style="display: none;">Upload</button>
+
 						<button class="btn btn-outline-warning p-2 ps-4 pe-4 m-2 text-light" onclick="resetPage(event)">
 							Reset </button>
+
 						<input class="btn btn-outline-success p-2 ps-4 pe-4 m-2 text-light" type="reset" value="Save"
 							id="submitButton">
 					</form>
@@ -44,6 +53,27 @@
 			{% for category, message in messages %}
 			{% if message == "success"%}
 			<script>Swal.fire("Saved!", "", "success");</script>
+			{% elif message == "wrongColFormat" %}
+			<script>
+				Swal.fire({
+					icon: "error",
+					title: "Invalid File Structure!",
+					text: "Please make sure that the file contain a column for Student ID as id and a column for Grades as grade."
+				});
+				let urlParams = new URLSearchParams(window.location.search);
+				urlParams.delete('wrongColFormat');
+				let newUrl = window.location.pathname;
+				window.history.replaceState({}, document.title, newUrl);
+			</script>
+
+			{% elif message == "noErrorSuccess" %}
+			<script>
+				Swal.fire("Saved!", "", "success");
+				urlParams = new URLSearchParams(window.location.search);
+				urlParams.delete('wrongColFormat');
+				newUrl = window.location.pathname;
+				window.history.replaceState({}, document.title, newUrl);
+			</script>
 			{% else %}
 			<div class="alert alert-{{ category }}">
 				{{ message }}
@@ -89,6 +119,26 @@
 		crossorigin="anonymous"></script>
 
 	<script>
+		let uploadFile = document.getElementById('uploadFile');
+		let submitBtn = document.getElementById('submitBtn');
+
+		uploadFile.addEventListener("change", function ()
+		{
+			if (isCSVFile(uploadFile.files[0]))
+			{
+				submitBtn.click();
+			} else
+			{
+				Swal.fire({
+					title: "Invalid File",
+					text: "Only CSV files is accpeted.",
+					icon: "info"
+				});
+				uploadFile.value = '';
+			}
+		});
+
+
 		let form = document.getElementById("gradeForm");
 		let submitButton = document.getElementById("submitButton");
 		submitButton.addEventListener("click", function ()
@@ -132,6 +182,10 @@
 					location.reload();
 				}
 			});
+		}
+		function isCSVFile(file)
+		{
+			return file.name.toLowerCase().endsWith(".csv");
 		}
 	</script>
 </body>

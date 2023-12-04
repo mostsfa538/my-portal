@@ -1,6 +1,7 @@
 from DB_connect import mysql
 from DB_connect import app
-from flask import render_template, redirect, url_for, session, request, flash, jsonify, Response
+from flask import render_template, redirect, url_for
+from flask import session, request, flash, Response
 import pandas as pd
 
 
@@ -8,8 +9,6 @@ import pandas as pd
 def grades(code):
     if 'id' not in session.keys():
         return redirect('/login')
-    first_name = ''
-    email = session['email']
     id = session['id']
     role = session['role']
     cur = mysql.connection.cursor()
@@ -24,7 +23,8 @@ def grades(code):
     result = cur.fetchone()
     pfp = result[0]
     cur.execute(
-        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `{role}_sub`\
+        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
@@ -35,12 +35,15 @@ def grades(code):
         grades = [list(grade) for grade in result]
         for index, grade in enumerate(grades):
             cur.execute(
-                f"SELECT first_name, last_name FROM student WHERE id = {grade[1]}")
+                f"SELECT first_name, last_name FROM student\
+                WHERE id = {grade[1]}")
             result = cur.fetchone()
             std_name = result[0] + ' ' + result[1]
             grades[index].append(std_name)
         cur.close()
-        return render_template('grades_teacher.html', role=role, code=code, pfp_link=pfp, grades=grades)
+        return render_template('grades_teacher.html',
+                               role=role, code=code,
+                               pfp_link=pfp, grades=grades)
     else:
         return ('no')
 
@@ -61,7 +64,8 @@ def download_grades(code):
     sub_id = result[0]
     sub_name = result[1]
     cur.execute(
-        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `{role}_sub`\
+        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
@@ -99,16 +103,13 @@ def edit_grades(code):
     result = cur.fetchone()
     if not result:
         return redirect('/custom_404')
-
     sub_id = result[0]
-    sub_name = result[1]
     cur.execute(
-        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `{role}_sub`\
+        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
-    grades = [{'name': 'ahmed', 'email': 'alo@gmail.com',
-               'id': 20220364, 'grade': 99}]
     cur.execute(f"""
         SELECT
             s.id AS id,
@@ -142,5 +143,52 @@ def edit_grades(code):
         if success:
             flash('success')
         return redirect(f'/subject/{code}/grades/edit')
-    print(grades)
+    alerts = request.args.get('error', default=None)
+    if alerts:
+        flash(alerts)
     return render_template('edit_grades.html', grades=grades, code=code)
+
+
+@app.route('/subject/<string:code>/grades/api/upload', methods=['POST'])
+def upload(code):
+    file = request.files['file']
+    df = pd.read_csv(file)
+    id = session['id']
+    role = session['role']
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT id, name FROM subject WHERE code = '{code}'")
+    result = cur.fetchone()
+    if not result:
+        return redirect('/custom_404')
+    sub_id = result[0]
+    cur.execute(
+        f"SELECT * from `{role}_sub`\
+        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+    result = cur.fetchall()
+    if not result:
+        return redirect(url_for('home', alert='notAllowed'))
+    success = False
+    for index, row in df.iterrows():
+        student_id = ''
+        new_grade = ''
+        try:
+            student_id = int(row['id'])
+            new_grade = str(row['grade'])
+            success = False
+        except:
+            return redirect(url_for('edit_grades',
+                                    code=code,
+                                    error='wrongColFormat'))
+        cur.execute(
+            "UPDATE grade SET grade = %s\
+            WHERE sub_id = %s and student_id = %s",
+            (new_grade, sub_id, student_id)
+        )
+        mysql.connection.commit()
+        success = True
+    cur.close()
+    if success:
+        return redirect(url_for('edit_grades', code=code, error='noErrorSuccess'))
+    else:
+        return redirect(f'/subject/{code}/grades/edit')

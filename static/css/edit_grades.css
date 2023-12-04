@@ -6,6 +6,9 @@
 
 
 body.dark-mode .table tr:hover {
-
     color: black !important;
+}
+
+input[type="file"] {
+    display: none;
 }

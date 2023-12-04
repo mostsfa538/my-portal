@@ -36,7 +36,8 @@ def home():
             results = cur.fetchone()
             if results:
                 sub_id = results[0]
-                cur.execute("SELECT * FROM student_sub WHERE student_id = (%s) AND sub_id = %s",
+                cur.execute("SELECT * FROM student_sub\
+                            WHERE student_id = (%s) AND sub_id = %s",
                             (id, sub_id))
                 joined_subject = cur.fetchone()
                 if joined_subject:
@@ -45,8 +46,9 @@ def home():
                 else:
                     cur.execute("INSERT INTO student_sub VALUES (%s, %s)",
                                 (id, sub_id))
-                    cur.execute("INSERT INTO grade (grade, student_id, sub_id) VALUES (%s, %s, %s)",
-                                (0, id, sub_id)) 
+                    cur.execute("INSERT INTO grade (grade, student_id, sub_id)\
+                    VALUES (%s, %s, %s)",
+                                (0, id, sub_id))
                     mysql.connection.commit()
             else:
                 flash('Subject Was not found!', 'danger')
