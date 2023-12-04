@@ -5,11 +5,8 @@ from flask import render_template, redirect, url_for, session, request, flash, j
 
 @app.route("/subject/<string:code>", methods=['GET'])
 def subject_page(code):
-    successful = ('email' in session)
-    if not successful:
+    if 'id' not in session.keys():
         return redirect('/login')
-    first_name = ''
-    email = session['email']
     id = session['id']
     role = session['role']
     cur = mysql.connection.cursor()
@@ -33,23 +30,27 @@ def subject_page(code):
 
 @app.route("/subject/<string:code>/book", methods=['GET'])
 def book_page(code):
-    successful = ('email' in session)
-    if not successful:
+    if 'id' not in session.keys():
         return redirect('/login')
-    first_name = ''
-    email = session['email']
     id = session['id']
     role = session['role']
     cur = mysql.connection.cursor()
     cur.execute(
-        f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {id}")
-    result = cur.fetchone()
-    pfp = result[0]
+        f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
+    pfp = cur.fetchone()[0]
     cur.execute(
         f"SELECT id FROM `subject` WHERE `code` = '{code}'")
-    result = cur.fetchone()[0]
+    result = cur.fetchone()
+    if not result:
+        return redirect('/custom_404')
+    sub_id = result[0]
     cur.execute(
-        f"SELECT link FROM book WHERE sub_id = {result}")
+        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+    result = cur.fetchall()
+    if not result:
+        return redirect(url_for('home', alert='notAllowed'))
+    cur.execute(
+        f"SELECT link FROM book WHERE sub_id = {sub_id}")
     result = cur.fetchall()
     links = result if result else []
     links = [list(link)[0] for link in links]
@@ -58,86 +59,72 @@ def book_page(code):
     return render_template('book.html', role=role, code=code, pfp_link=pfp, links=links)
 
 
-@app.route("/subject/<string:code>/chat", methods=['GET'])
-def chat_page(code):
-    successful = ('email' in session)
-    if not successful:
+@app.route('/subject/<string:code>/students', methods=['GET'])
+def list_students(code):
+    if 'id' not in session.keys():
         return redirect('/login')
-    chat_messages = get_chat_messages(code)
-    first_name = ''
-    email = session['email']
     id = session['id']
-    submit = True
     role = session['role']
     cur = mysql.connection.cursor()
-    cur.execute(f"SELECT profile_avatar FROM {role} WHERE id = %s", (id,))
+    cur.execute(
+        f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
+    pfp = cur.fetchone()[0]
+    cur.execute(
+        f"SELECT id FROM `subject` WHERE `code` = '{code}'")
     result = cur.fetchone()
-    pfp = result[0]
-    cur.close()
-    return render_template('chat.html', role=role, code=code, chat_messages=chat_messages, pfp_link=pfp)
-
-
-@app.route('/subject/<string:code>/chat/api/send', methods=['POST'])
-def send_chat_message(code):
-    successful = ('email' in session)
-    if not successful:
-        return redirect('/login')
-    user_id = session['id']
-    role = session['role']
-    message = request.form.get('message')
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT id FROM subject WHERE code = %s", (code,))
-    result = cur.fetchone()
+    if not result:
+        return redirect('/custom_404')
     sub_id = result[0]
-    cur.execute("INSERT INTO chat_messages (sub_id, user_id, role, message) VALUES (%s, %s, %s, %s)",
-                (sub_id, user_id, role, message))
+    cur.execute(
+        f"SELECT * from `teacher_sub` WHERE sub_id = {sub_id} and `teacher_id` = {id}")
+    result = cur.fetchall()
+    if not result:
+        return redirect(url_for('home', alert='notAllowed'))
+    cur.execute(f"""
+                SELECT
+                    s.id AS student_id,
+                    CONCAT(s.first_name, ' ', s.last_name) AS full_name,
+                    s.email
+                FROM
+                    student s
+                JOIN
+                    student_sub s_sub ON s.id = s_sub.student_id
+                WHERE
+                    s_sub.sub_id = {sub_id};
+                """)
+    students = cur.fetchall()
+    students = [list(student) for student in students]
+    cur.close()
+    return render_template('list_students.html',
+                           role=role, code=code,
+                           pfp_link=pfp, students=students)
+
+
+@app.route('/subject/<string:code>/students/delete', methods=['POST'])
+def delete_student(code):
+    if 'id' not in session.keys():
+        return redirect('/login')
+    id = session['id']
+    role = session['role']
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
+    pfp = cur.fetchone()[0]
+    cur.execute(
+        f"SELECT id FROM `subject` WHERE `code` = '{code}'")
+    result = cur.fetchone()
+    if not result:
+        return redirect('/custom_404')
+    sub_id = result[0]
+    student_id = request.form.get('student_id')
+    cur.execute(
+        f"DELETE FROM student_sub\
+        WHERE sub_id = {sub_id} and student_id = {student_id}"
+    )
+    cur.execute(
+        f"DELETE FROM grade\
+        WHERE student_id = {student_id} and sub_id = {sub_id}"
+    )
     mysql.connection.commit()
     cur.close()
-
-    return jsonify(success=True)
-
-
-@app.route('/subject/<string:code>/chat/api')
-def get_chat_messages(code):
-    successful = ('email' in session)
-    if not successful:
-        return redirect('/login')
-    chat_messages = get_chat_messages(code)
-    chat_messages = [list(t) for t in chat_messages]
-    user_id = session['id']
-    cur = mysql.connection.cursor()
-    for index, message in enumerate(chat_messages):
-        if str(message[0]) == str(session['id']):
-            chat_messages[index].append('right')
-            cur.execute(
-                f"SELECT profile_avatar, first_name FROM `{session['role']}` WHERE id = {user_id}")
-            result = cur.fetchone()
-            name = f"{''if session['role'] == 'student' else 'Dr.'}{result[1]}"
-            chat_messages[index].append(str(result[0]))
-            chat_messages[index].append(str(name))
-        else:
-            chat_messages[index].append('left')
-            cur.execute(
-                f"SELECT profile_avatar, first_name FROM `{message[3]}` WHERE id = %s", (message[0],))
-            result = cur.fetchone()
-            name = f"{''if message[3] == 'student' else 'Dr.'}{result[1]}"
-            chat_messages[index].append(str(result[0]))
-            chat_messages[index].append(str(name))
-    cur.execute(
-        f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {user_id}")
-    result = cur.fetchone()
-    pfp = result[0]
-    return render_template('chat_messages.html', chat_messages=chat_messages, pfp=pfp)
-
-
-def get_chat_messages(code):
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT id FROM subject WHERE code = %s", (code,))
-    result = cur.fetchone()
-    sub_id = result[0]
-    cur.execute(
-        "SELECT user_id, message, timestamp, role FROM chat_messages WHERE sub_id = %s ORDER BY timestamp ASC", (sub_id,))
-    chat_messages = cur.fetchall()
-    cur.close()
-    # print(sub_id)
-    return (chat_messages)
+    return redirect(f'/subject/{code}/students')

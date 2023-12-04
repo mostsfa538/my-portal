@@ -12,14 +12,14 @@
 </head>
 
 <body>
-
 	<div class="container d-flex justify-content-center align-items-center min-vh-100">
 		<div class="row border rounded-5 p-3 bg-white shadow box-area">
 			<div class="col-md-6 rounded-4 d-flex justify-content-center align-items-center flex-column left-box"
 				style="background: #103cbe;">
 
 				<div class="featured-image mb-3">
-					<img src="{{ url_for('static', filename='images/login_register.png') }}"" class="img-fluid" style="width: 450px;">
+					<img src="{{ url_for('static', filename='images/login_register.png') }}"" class=" img-fluid"
+						style="width: 450px;">
 				</div>
 				<p class="text-white fs-2" style="font-family: 'Courier New', Courier, monospace; font-weight: 600;">Be
 					Verified</p>
@@ -62,15 +62,15 @@
 						</div>
 						<div class="input-group mb-1">
 							{%if form.password.errors%}
-								{{ form.password(class="form-control form-control-lg bg-light fs-6 is-invalid",
-								placeholder="Password")}}
-									<div class="invalid-feedback">
-										{% for error in form.password.errors %}
-											<span>{{ error }}</span>
-									{% endfor %}
-									</div>
-								{% else %}
-								{{ form.password(class="form-control form-control-lg bg-light fs-6",
+							{{ form.password(class="form-control form-control-lg bg-light fs-6 is-invalid",
+							placeholder="Password")}}
+							<div class="invalid-feedback">
+								{% for error in form.password.errors %}
+								<span>{{ error }}</span>
+								{% endfor %}
+							</div>
+							{% else %}
+							{{ form.password(class="form-control form-control-lg bg-light fs-6",
 							placeholder="Password")}}
 							{% endif %}
 						</div>
@@ -89,8 +89,9 @@
 							{{ form.submit(class="btn btn-lg btn-primary w-100 fs-6") }}
 						</div>
 						<div class="input-group mb-3">
-							<button class="btn btn-lg btn-light w-100 fs-6"><img src="{{ url_for('static', filename='images/google.png') }}""
-									style="width:20px" class="me-2"><small>Sign In with Google</small></button>
+							<button class="btn btn-lg btn-light w-100 fs-6"><img
+									src="{{ url_for('static', filename='images/google.png') }}""
+									style=" width:20px" class="me-2"><small>Sign In with Google</small></button>
 						</div>
 						<div class="row">
 							<small>Don't have an account? <a href="/path">Sign Up</a></small>
@@ -103,8 +104,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
 		crossorigin="anonymous"></script>
-
-	<script src="{{ url_for('static', filename='js/login.js') }}"></script>
 </body>
 
 </html>

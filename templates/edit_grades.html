@@ -25,14 +25,8 @@
 					<a class="navbar-brand text-light fs-2" href="/subject/{{ code }}/grades">MyPotral Grade System</a>
 					<form class="d-flex" enctype="multipart/form-data" action="/subject/{{ code }}/grades/api/upload"
 						id="uploadFileForm" method="POST">
-						<!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
-						<!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
 						<a class="btn btn-outline-primary p-2 ps-4 pe-4 m-2 text-light"
 							href="/subject/{{ code }}/grades/api/download"> Download</a>
-
-						<!-- <label for="uploadFileInput" class="text-light btn btn-outline-info">Upload</label>
-						<input type="file" name="file" accept=".csv" id="uploadFileInput">
-						<button class="btn btn-outline-info p-2 ps-4 pe-4 m-2" id="uploadFile">Upload</button> -->
 						<label for="uploadFile" class="btn btn-outline-info p-2 ps-4 pe-4 m-2 text-light">Upload
 							<input type="file" id="uploadFile" name="file" accept=".csv" required class="btn">
 						</label>
