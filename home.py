@@ -45,6 +45,8 @@ def home():
                 else:
                     cur.execute("INSERT INTO student_sub VALUES (%s, %s)",
                                 (id, sub_id))
+                    cur.execute("INSERT INTO grade (grade, student_id, sub_id) VALUES (%s, %s, %s)",
+                                (0, id, sub_id)) 
                     mysql.connection.commit()
             else:
                 flash('Subject Was not found!', 'danger')
@@ -59,8 +61,8 @@ def home():
             cur.execute("INSERT INTO subject (name, code) VALUES (%s, %s)",
                         (subject_name, code))
             new_sub_id = cur.lastrowid
-            cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 1)",
-                        (id, new_sub_id))
+            cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, %s)",
+                        (1, id, new_sub_id))
             for book in books:
                 book = convert_drive_link(book)
                 cur.execute(
@@ -78,7 +80,7 @@ def home():
                     submit = False
                     break
                 sec_teacher = result[0]
-                cur.execute("INSERT INTO teacher_sub VALUES (%s, %s, 0)",
+                cur.execute("INSERT INTO teacher_sub VALUES (0, %s, %s)",
                             (sec_teacher, new_sub_id))
             cur.close()
         if submit:
@@ -92,6 +94,9 @@ def home():
         cur.execute(
             "SELECT first_name, profile_avatar FROM student WHERE id = (%s)", (id,))
         result = cur.fetchone()
+        if not result:
+            return redirect('/login')
+
         first_name = result[0]
         pfp = result[1]
 
@@ -107,6 +112,8 @@ def home():
         cur.execute(
             "SELECT first_name, profile_avatar FROM teacher WHERE id = (%s)", (id,))
         result = cur.fetchone()
+        if not result:
+            return redirect('/login')
         first_name = result[0]
         pfp = result[1]
 
@@ -116,6 +123,9 @@ def home():
         subs_id = [row[0] for row in result] if result else []
         subs = get_subjects(subs_id)
         cur.close()
+    alerts = request.args.get('alert', default=None)
+    if alerts:
+        flash(alerts)
     return render_template('home.html', role=role, form=form,
                            message=message, submit=not submit,
                            title='Home Page',
@@ -161,3 +171,13 @@ def root():
         return redirect('/home')
     else:
         return redirect('/login')
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return redirect(url_for('custom_404')), 404
+
+
+@app.route('/custom_404')
+def custom_404():
+    return render_template('404.html')

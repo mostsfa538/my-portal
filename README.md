@@ -19,3 +19,4 @@
     - flask_session
     - flask_mysqldb
     - email_validator
+    - pandas

@@ -28,6 +28,16 @@
 					<p>Enter the code below.</p>
 				</div>
 				<form id="verifyCodeForm" action="/verify_code" method="POST" novalidate>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">
+						{{ message }}
+					</div>
+					{% endfor %}
+					{% endif %}
+					{% endwith %}
+
 					{% if form %}
 					{{ form.csrf_token }}
 					<div class="input-group mb-3">

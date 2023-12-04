@@ -1,5 +1,7 @@
-{% extends "subject.html"%} {% block subject_page%}
-<div>{% with messages = get_flashed_messages(with_categories=true) %}
+{% extends "subject.html"%}
+{% block subject_page%}
+<div>
+	{% with messages = get_flashed_messages(with_categories=true) %}
 	{% if messages %}
 	{% for category, message in messages %}
 	<div class="alert alert-{{ category }}">

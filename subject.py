@@ -15,8 +15,18 @@ def subject_page(code):
     cur = mysql.connection.cursor()
     cur.execute(
         f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {id}")
+    pfp = cur.fetchone()[0]
+    cur.execute(
+        f"SELECT id FROM `subject` WHERE `code` = '{code}'")
     result = cur.fetchone()
-    pfp = result[0]
+    if not result:
+        return redirect('/custom_404')
+    sub_id = result[0]
+    cur.execute(
+        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+    result = cur.fetchall()
+    if not result:
+        return redirect(url_for('home', alert='notAllowed'))
     cur.close()
     return render_template('subject.html', role=role, code=code, pfp_link=pfp, main_page=1)
 

@@ -57,7 +57,8 @@ def register():
 
             cur = mysql.connection.cursor()
             cur.execute("INSERT INTO student (first_name, middle_name,\
-                        last_name, date_of_birth, email, password, profile_avatar) "
+                        last_name, date_of_birth,\
+                        email, password, profile_avatar)"
                         "VALUES (%s, %s, %s, %s, %s, %s, %s)",
                         (firstName, middleName, lastName, date,
                          email, hashed_password, avatar))
@@ -66,12 +67,15 @@ def register():
             code = generate_random_code()
             session['code'] = code
             session['temp_mail'] = email
+            html_body = render_template('email_code.html',
+                                        verification_code=code,
+                                        message="Registration")
             msg = Message(
                 'Verification Code',
-                sender='my-portal@gmail.com',
-                recipients=[email]
+                sender='mostafa51mokhtar@gmail.com',
+                recipients=[email],
+                html=html_body
             )
-            msg.body = f'Your verification code is: {code}'
             mail.send(msg)
             return redirect('/verifyRegister')
     return render_template("registerStudent.html", form=form)
@@ -83,7 +87,6 @@ def registerTeacher():
     if 'email' in session:
         return redirect("/home")
     if form.validate_on_submit():
-        # print('yes')
         firstName = form.firstName.data
         lastName = form.lastName.data
         date = '2004-01-5'
@@ -105,23 +108,26 @@ def registerTeacher():
             return redirect("/login")
         else:
             cur = mysql.connection.cursor()
+            avatar = 'https://raw.githubusercontent.com/LORDyyyyy/my-portal/main/static/images/teacher.png'
             cur.execute(
                 "INSERT INTO teacher (first_name, last_name, date_of_birth,\
-                email, password) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (firstName, lastName, date, email, hashed_password))
+                email, password, profile_avatar) "
+                "VALUES (%s, %s, %s, %s, %s, %s)",
+                (firstName, lastName, date, email, hashed_password, avatar))
             mysql.connection.commit()
             cur.close()
             code = generate_random_code()
             session['code'] = code
             session['temp_mail'] = email
+            html_body = render_template('email_code.html',
+                                        verification_code=code,
+                                        message="Registration")
             msg = Message(
                 'Verification Code',
-                sender='my-portal@gmail.com',
-                recipients=[email]
+                sender='mostafa51mokhtar@gmail.com',
+                recipients=[email],
+                html=html_body
             )
-
-            msg.body = f'Your verification code is: {code}'
             mail.send(msg)
             return redirect('/verifyRegister')
 
@@ -163,7 +169,6 @@ def logins():
                 session['email'] = email
                 session['id'] = id
                 session['role'] = role
-                # print(f'{session}')
                 return redirect("/")
             else:
                 flash('Login Unsuccessful.\n\
@@ -185,10 +190,8 @@ def verifyCode():
     form = VerifyRegister()
     if form.validate_on_submit():
         user_code = form.verification_code.data
-        # print(email)
         if request.method == 'POST':
             code = session.get('code', None)
-            # print(code, user_code)
             if code and user_code and user_code == code:
                 cur = mysql.connection.cursor()
                 cur.execute("""
@@ -216,9 +219,8 @@ def verifyCode():
                     session.pop('temp_mail', None)
 
                     return redirect('/home')
-
-        else:
-            flash('Invalid verification code. Please try again.')
+            else:
+                flash('Invalid verification code. Please try again.', 'danger')
     return render_template('verifyRegister.html', form=form)
 
 

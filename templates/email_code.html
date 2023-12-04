@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #007bff;
+    }
+
+    p {
+      color: #333;
+    }
+
+    .verification-code {
+      font-size: 24px;
+      font-weight: bold;
+      color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>MyPortal - Email Verification</h1>
+    <p>Hello There! To complete your {{ message }}, please use the following verification code:</p>
+    <p class="verification-code">{{ verification_code }}</p>
+  </div>
+</body>
+
+</html>

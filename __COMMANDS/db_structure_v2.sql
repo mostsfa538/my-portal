@@ -127,7 +127,7 @@ CREATE TABLE pdfs(
 CREATE TABLE grade(
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	grade INT DEFAULT(0),
-	student_id VARCHAR(15) NOT NULL,
+	student_id NOT NULL,
 	sub_id INT NOT NULL,
 	FOREIGN KEY (student_id) REFERENCES student(id),
 	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE

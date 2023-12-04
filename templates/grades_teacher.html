@@ -1,0 +1,41 @@
+{% extends "subject.html"%}
+{% block subject_page%}
+<div class="col grades">
+  <div class="col container-fluid">
+    <div class=" mb-1 d-flex justify-content-center">
+      <div class=" p-2 ">
+				<!-- <button type="button" class="btn btn-primary p-2 pe-5 ps-5"> -->
+					<a class="btn btn-primary p-2 pe-5 ps-5" href="/subject/{{ code }}/grades/api/download"> Print </a>
+				<!-- </button> -->
+      </div>
+      <div class=" p-2 ">
+        <button type="button" class="btn btn-success p-2 pe-5 ps-5">Edit</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="">
+          <table class="table table-bordered text-center">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>GRADE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grade in grades%}
+              <tr>
+                <td>{{ grade[1] }}</td>
+                <td>{{ grade[2] }}</td>
+                <td>{{ grade[0] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock subject_page%}

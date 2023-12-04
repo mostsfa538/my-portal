@@ -12,7 +12,7 @@ bcrypt = Bcrypt()
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'mlord62716@gmail.com'
-app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_PASSWORD'] = 'omoi lzmv wior qicw'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -43,16 +43,19 @@ def forgotpassword():
             code = generate_random_code()
             session['code'] = code
             session['temp_mail'] = email
+            html_body = render_template('email_code.html',
+                                        verification_code=code,
+                                        message="Password Reset")
             msg = Message(
                 'Verification Code',
                 sender='mostafa51mokhtar@gmail.com',
-                recipients=[email]
+                recipients=[email],
+                html=html_body
             )
-            msg.body = f'Your verification code is: {code}'
             mail.send(msg)
             return redirect('/verify_code')
         else:
-            flash('Email is not exist')
+            flash('Email does not exist', "danger")
 
     return render_template("forgotpass.html", form=form)
 
@@ -69,8 +72,8 @@ def verify_code():
             code = session.get('code', None)
             if code and user_code and user_code == code:
                 return redirect('/reset_pass')
-        else:
-            flash('Invalid verification code. Please try again.')
+            else:
+                flash('Invalid verification code. Please try again.', "danger")
     return render_template('verify_code.html', form=form)
 
 
@@ -86,26 +89,30 @@ def reset_pass():
         confirmPassword = form.confrimPassword.data
 
         if password and confirmPassword and password == confirmPassword:
-            hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+            hashed_password = bcrypt.generate_password_hash(
+                password).decode('utf-8')
 
             cur = mysql.connection.cursor()
 
-            cur.execute("SELECT email FROM student WHERE email LIKE %s", (email,))
+            cur.execute(
+                "SELECT email FROM student WHERE email LIKE %s", (email,))
             exist_student = cur.fetchone()
 
             if exist_student:
-                cur.execute("UPDATE student SET password = %s WHERE email LIKE %s", (hashed_password, email))
+                cur.execute(
+                    "UPDATE student SET password = %s WHERE email LIKE %s", (hashed_password, email))
             else:
-                cur.execute("UPDATE teacher SET password = %s WHERE email LIKE %s", (hashed_password, email))
+                cur.execute(
+                    "UPDATE teacher SET password = %s WHERE email LIKE %s", (hashed_password, email))
 
             mysql.connection.commit()
             cur.close()
 
             session.pop('temp_mail', None)
-            flash("Password successfully changed.")
+            flash("Password successfully changed.", "success")
             return redirect('/login')
 
         else:
-            flash("Passwords do not match.")
+            flash("Passwords do not match.", "danger")
 
     return render_template('reset_pass.html', form=form)
