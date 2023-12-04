@@ -1,7 +1,7 @@
 .table tr:hover {
     background-color: rgb(221, 221, 221);
-    font-size: 18px;
-    transition-duration: 0.15s;
+    /* font-size: 18px; */
+    /* transition-duration: 0.15s; */
 }
 
 
