@@ -6,6 +6,7 @@ from subject import *
 from news import *
 from grades import *
 from chat import *
+from quiz import *
 
 bcrypt = Bcrypt(app)
 

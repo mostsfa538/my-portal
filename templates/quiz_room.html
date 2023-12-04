@@ -1,0 +1,20 @@
+{% extends "subject.html"%}
+{% block subject_page%}
+
+<div class="col"> 
+	{% for Quiz in quiz %}
+    <section>
+        <div class="container-my-5 bg-primary p-3 mb-3 mt-1">
+            <h1 id="h22" style="color: white; font-size: 80px;"> Quiz-{{Quiz[5]}} </h1>
+		</div>
+	    <h3>Description: {{Quiz[0]}}</h3>
+	    <h3>Start Time: {{Quiz[1]}}</h3>
+	    <h3>Duration: {{Quiz[3]}}</h3>
+		<h3>Link: <a href="{{Quiz[4]}}"> Click  Me!</a></h3>
+    </section>
+<hr>
+    {% endfor %}
+
+</div>
+
+{%endblock subject_page%}
