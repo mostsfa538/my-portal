@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title></title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{ title }}</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_grades.css') }}">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+		const Swal = require('sweetalert2')
+	</script>
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
+<body>
+	<div class="container-fluid">
+		<div class="row sticky-top">
+			<nav class="navbar bg-body-tertiary bg-dark ">
+				<div class="container-fluid">
+					<a class="navbar-brand text-light fs-2">MyPotral Grade System</a>
+					<form class="d-flex">
+						<!-- <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> -->
+						<!-- <button class="btn btn-outline-success" type="submit">Search</button> -->
+						<a class="btn btn-outline-primary p-2 ps-4 pe-4 m-2 text-light"
+							href="/subject/{{ code }}/grades/api/download"> Download</a>
+						<button class="btn btn-outline-info p-2 ps-4 pe-4 m-2 text-light"> Upload
+						</button>
+						<button class="btn btn-outline-warning p-2 ps-4 pe-4 m-2 text-light" onclick="resetPage(event)">
+							Reset </button>
+						<input class="btn btn-outline-success p-2 ps-4 pe-4 m-2 text-light" type="reset" value="Save"
+							id="submitButton">
+					</form>
+				</div>
+			</nav>
+		</div>
+		<div class="row">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+			{% for category, message in messages %}
+			{% if message == "success"%}
+			<script>Swal.fire("Saved!", "", "success");</script>
+			{% else %}
+			<div class="alert alert-{{ category }}">
+				{{ message }}
+			</div>
+			{% endif %}
+			{% endfor %}
+			{% endif %}
+			{% endwith %}
+			<div class="col">
+				<div class="container mt-5 text-center">
+					<form method="post" id="gradeForm">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Email</th>
+									<th>ID</th>
+									<th>NAME</th>
+									<th>GRADE</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for grade in grades %}
+								<tr>
+									<td>{{ grade.email }}</td>
+									<td>{{ grade.id }}</td>
+									<td>{{ grade.name }}</td>
+									<td>
+										<input type="text" name="grade_{{ grade.id }}" class="form-control text-center"
+											value="{{ grade.grade }}">
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+		crossorigin="anonymous"></script>
+
+	<script>
+		let form = document.getElementById("gradeForm");
+		let submitButton = document.getElementById("submitButton");
+		submitButton.addEventListener("click", function ()
+		{
+			Swal.fire({
+				title: "Do you want to save the changes?",
+				showDenyButton: true,
+				showCancelButton: true,
+				confirmButtonText: "Save",
+				denyButtonText: `Don't save`
+			}).then((result) =>
+			{
+				if (result.isConfirmed)
+				{
+					form.submit();
+					Swal.fire("Saved!", "", "success");
+				} else if (result.isDenied)
+				{
+					Swal.fire("Changes are not saved", "", "info").then((result) =>
+					{
+						if (result.isConfirmed || result.dismiss === Swal.DismissReason.close)
+						{
+							location.reload();
+						}
+					});;
+				}
+			});
+		});
+
+		function resetPage(event)
+		{
+			event.preventDefault();
+			Swal.fire({
+				title: "Reset Done!",
+				text: "Changes are not saved",
+				icon: "success"
+			}).then((result) =>
+			{
+				if (result.isConfirmed || result.dismiss === Swal.DismissReason.cancel)
+				{
+					location.reload();
+				}
+			});
+		}
+	</script>
+</body>
+
+</html>

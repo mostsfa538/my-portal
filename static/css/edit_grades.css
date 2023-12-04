@@ -1,0 +1,11 @@
+.table tr:hover {
+    background-color: rgb(221, 221, 221);
+    /* font-size: 18px; */
+    /* transition-duration: 0.15s; */
+}
+
+
+body.dark-mode .table tr:hover {
+
+    color: black !important;
+}
