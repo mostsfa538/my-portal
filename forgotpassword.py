@@ -100,10 +100,14 @@ def reset_pass():
 
             if exist_student:
                 cur.execute(
-                    "UPDATE student SET password = %s WHERE email LIKE %s", (hashed_password, email))
+                    "UPDATE student SET password = %s\
+                    WHERE email LIKE %s", (hashed_password, email)
+                )
             else:
                 cur.execute(
-                    "UPDATE teacher SET password = %s WHERE email LIKE %s", (hashed_password, email))
+                    "UPDATE teacher SET password = %s\
+                    WHERE email LIKE %s", (hashed_password, email)
+                )
 
             mysql.connection.commit()
             cur.close()

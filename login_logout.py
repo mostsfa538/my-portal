@@ -1,9 +1,11 @@
-from form import RegistrationStudent, Login, RegistrationTeacher, Verify, VerifyRegister
-from flask import render_template, flash, redirect, session
+from form import RegistrationStudent, Login
+from form import RegistrationTeacher, VerifyRegister
+from flask import render_template, flash, redirect, session, request
 from DB_connect import mysql
 from DB_connect import app
 from flask_bcrypt import Bcrypt
 from forgotpassword import *
+import string
 import random
 
 
@@ -212,7 +214,9 @@ def verifyCode():
                     role = result[0]
                     cur = mysql.connection.cursor()
                     cur.execute(
-                        f"UPDATE {role} SET email_verified = 1 WHERE email LIKE %s", (email,))
+                        f"UPDATE {role} SET email_verified = 1\
+                            WHERE email LIKE %s", (email,)
+                    )
                     mysql.connection.commit()
                     cur.close()
                     session.pop('code', None)

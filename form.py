@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FieldList
-from wtforms.validators import DataRequired, Length, Email, Optional, URL, EqualTo
+from wtforms.validators import DataRequired, Length
+from wtforms.validators import Email, Optional, URL, EqualTo
 
 
 class RegistrationStudent(FlaskForm):
@@ -12,7 +13,10 @@ class RegistrationStudent(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+                                     validators=[DataRequired(),
+                                                 EqualTo('password')
+                                                 ]
+                                     )
     submit = SubmitField('Submit')
 
 
@@ -30,7 +34,10 @@ class RegistrationTeacher(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+                                     validators=[DataRequired(),
+                                                 EqualTo('password')
+                                                 ]
+                                     )
     submit = SubmitField('Submit')
 
 
