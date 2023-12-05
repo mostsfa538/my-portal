@@ -46,7 +46,8 @@
 							</a>
 							<ul class="dropdown-menu">
 								{% for lec in lecs %}
-								<li><a class="dropdown-item" href="/subject/{{ code }}/lecture/{{lec[1]}}">Lecture {{lec[0]}}</a></li>
+								<li><a class="dropdown-item" href="/subject/{{ code }}/lecture/{{lec[1]}}">Lecture
+										{{lec[0]}}</a></li>
 								{% endfor %}
 								{% if role == "teacher"%}
 								<li><a class="dropdown-item" href="/subject/{{ code }}/add_lecture">Add Lecture</a></li>
@@ -77,7 +78,49 @@
 	</div>
 	<div class="row">
 		{% if main_page %}
-		<div> Main page content here </div>
+		<div class="h-100 col">
+			<div class="m-2">
+				<div class="text-center">
+
+					{% for lec in lecs %}
+					<div class="d-inline-flex m-1">
+						<!-- url is true -->
+						<a href="/subject/{{ code }}/lecture/{{lec[1]}}"><button
+								class="py-3 px-5 btn-outline-primary rounded">Lecture {{lec[0]}}</button></a>
+					</div>
+					{% endfor %}
+					<!-- session	 -->
+					{% if role == "teacher" %}
+					<div class="d-inline-flex m-1">
+						<a href="/subject/{{ code }}/add_lecture"><button
+								class="py-3 px-5 btn-outline-primary rounded"><i class="bi bi-plus-lg"></i></button></a>
+					</div>
+					{% endif %}
+				</div>
+				<div class="mx-5">
+					<hr>
+				</div>
+				<div class="row">
+					<div class="col m-3 text-start">
+						<a href="/subject/{{ code }}/grades"><button
+								class="py-3 px-5 btn-outline-primary rounded">Grades</button></a>
+					</div>
+					<div class="col m-3 text-end">
+						<a href="/subject/{{ code }}/quiz_room"><button
+								class="py-3 px-5 btn-outline-primary rounded">Quizes</button></a>
+					</div>
+				</div>
+				<div class="mx-5">
+					<hr>
+				</div>
+				<div class="row m-3 p-3 text-center bg-light border border-2 border-primary rounded">
+					<a href="/subject/{{ code }}/chat">General Chat</a>
+				</div>
+				<div class="row m-3 p-3 text-center bg-light border border-2 border-primary rounded">
+					<a href="/subject/{{ code }}/news">Announcement Chat</a>
+				</div>
+			</div>
+		</div>
 		{% else %}
 		{% block subject_page %}{% endblock %}
 		{% endif %}

@@ -6,20 +6,6 @@ from werkzeug.utils import secure_filename
 import os
 from form import UploadPDF
 
-# @app.route("/details_of_sub/<int:sub_id>")
-# def details(sub_id):
-#     role = session['role']
-#     cur = mysql.connection.cursor()
-
-#     book = cur.fetchall
-#     book = cur.execute(f"SELECT link FROM book WHERE sub_id = {sub_id}")
-#     lec = cur.execute(f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
-
-#     mysql.connection.commit()
-#     cur.close()
-
-#     return render_template('details_of_sub.html', books=book, Lec_id=lec, sub_id=sub_id, role=role)
-
 
 @app.route("/subject/<string:code>/add_lecture", methods=['GET', 'POST'])
 def AddNewLec(code):
@@ -118,7 +104,8 @@ def SeeLec(code, lec_id):
         return redirect(url_for('home', alert='notAllowed'))
 
     Lec = cur.execute(
-        f"SELECT title, notes FROM lecture WHERE id = {lec_id} AND sub_id = {sub_id}")
+        f"SELECT title, notes FROM lecture\
+        WHERE id = {lec_id} AND sub_id = {sub_id}")
     Lec = [lec for lec in cur.fetchone()]
     Video = cur.execute(
         f"SELECT link FROM video WHERE lec_id = {lec_id} AND sub_id = {sub_id}")
@@ -127,14 +114,16 @@ def SeeLec(code, lec_id):
         f"SELECT link FROM pdfs WHERE lec_id = {lec_id} AND sub_id = {sub_id}")
     Slide = [list(slide)[0] for slide in cur.fetchall()]
     Sheet = cur.execute(
-        f"SELECT file_link, submit_link FROM sheets WHERE lec_id = {lec_id} AND sub_id = {sub_id}")
+        f"SELECT file_link, submit_link FROM sheets\
+        WHERE lec_id = {lec_id} AND sub_id = {sub_id}")
     Sheet = [list(slide) for slide in cur.fetchall()]
     cur.execute(
         f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
     lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
+    lec_count = [lec[0] for lec in lecs if lec[1] == lec_id][0]
     cur.close()
     return render_template('see_lecture.html', role=role,
                            code=code, pfp_link=pfp,
-                           title='Lecture', TitNot=Lec,
+                           title=f'Lecture {lec_count}', TitNot=Lec,
                            Videos=Video, Slides=Slide,
                            Sheets=Sheet, lecs=lecs)
