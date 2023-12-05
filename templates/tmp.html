@@ -1,0 +1,44 @@
+<div class="col-2 bg-danger p-3">
+    <h2 class="display-5 text-light">Database</h2>
+    <div class="list-group" id="list-tab" role="tablist">
+        <a class="list-group-item list-group-item-action" role="tab">
+            <span class="" type="button" data-bs-toggle="collapse" data-bs-target="#Lectures" aria-expanded="false"
+                aria-controls="Lectures">
+                Lectures
+            </span>
+        </a>
+        <div class=" collapse" id="Lectures">
+            <div class="card card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item list-group-item-action"> <a href="#">Lecture 1</a></li>
+                    <li class="list-group-item list-group-item-action"> <a href="#">Lecture 1</a></li>
+                    <li class="list-group-item list-group-item-action"> <a href="#">Lecture 1</a></li>
+                    {% if role == "teacher"%}
+                    <li class="list-group-item list-group-item-action"> <a href="#">Add Lecture</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <a class="list-group-item list-group-item-action" href="#" role="tab"> Book </a>
+        <a class="list-group-item list-group-item-action" href="/subject/{{code}}/chat" role="tab"> General Chat
+        </a>
+        <a class="list-group-item list-group-item-action" href="#" role="tab"> Announcement Chat </a>
+        <a class="list-group-item list-group-item-action" href="#" role="tab"> Grades </a>
+        <a class="list-group-item list-group-item-action" role="tab">
+            <span class="" type="button" data-bs-toggle="collapse" data-bs-target="#QuizPage" aria-expanded="false"
+                aria-controls="QuizPage">
+                Quizzes
+            </span>
+        </a>
+        <div class=" collapse" id="QuizPage">
+            <div class="card card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item list-group-item-action"> <a href="#">Show Quizzes</a></li>
+                    {% if role == "teacher"%}
+                    <li class="list-group-item list-group-item-action"> <a href="#">Add Quiz</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

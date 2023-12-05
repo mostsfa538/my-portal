@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FieldList
 from wtforms.validators import DataRequired, Length
 from wtforms.validators import Email, Optional, URL, EqualTo
+from flask_wtf.file import FileField, FileAllowed
 
 
 class RegistrationStudent(FlaskForm):
@@ -83,3 +84,12 @@ class VerifyRegister(FlaskForm):
 class SendNews(FlaskForm):
     message = StringField('Send Message', validators=[DataRequired()])
     submit = SubmitField('Send')
+
+
+class edit_profile(FlaskForm):
+    Name = StringField('Name', validators=[DataRequired(),
+                            Length(min=2, max=15)])
+    Photo = FileField('Photo', validators=[
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Only JPEG and PNG images are allowed.')
+    ])
+    submit = SubmitField('Update Profile')

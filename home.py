@@ -2,6 +2,7 @@ from DB_connect import mysql
 from DB_connect import app
 from flask import render_template, redirect, url_for, session, request, flash
 from form import Student_SubjectForm, Teacher_SubjectForm
+from edit_profile import *
 import random
 import uuid
 

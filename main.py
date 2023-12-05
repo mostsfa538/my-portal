@@ -7,6 +7,8 @@ from news import *
 from grades import *
 from chat import *
 from quiz import *
+from edit_profile import *
+from flask import Flask
 
 bcrypt = Bcrypt(app)
 

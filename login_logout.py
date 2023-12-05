@@ -147,7 +147,19 @@ def logins():
         password = form.password.data
 
         cur = mysql.connection.cursor()
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT email FROM student\
+                                WHERE email_verified = 1\
+                                UNION\
+                                SELECT email FROM teacher\
+                                WHERE email_verified = 1", )
+        existing_student = cur.fetchone()
+        cur.close()
 
+        if not existing_student:
+            flash('Email is Not verified.',
+                  'danger')
+            return redirect('/verifyRegister')
         cur.execute("""
             SELECT email, password, id, 'student' as role
             FROM student
