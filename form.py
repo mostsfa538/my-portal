@@ -87,8 +87,8 @@ class SendNews(FlaskForm):
 
 
 class edit_profile(FlaskForm):
-    Name = StringField('Name', validators=[DataRequired(),
-                            Length(min=2, max=15)])
+    # Name = StringField('Name', validators=[DataRequired(),
+                            # Length(min=2, max=15)])
     Photo = FileField('Photo', validators=[
         FileAllowed(['jpg', 'png', 'jpeg'], 'Only JPEG and PNG images are allowed.')
     ])

@@ -145,15 +145,13 @@ def logins():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-
-        cur = mysql.connection.cursor()
         cur = mysql.connection.cursor()
         cur.execute("SELECT email FROM student\
                                 WHERE email_verified = 1\
                                 UNION\
                                 SELECT email FROM teacher\
                                 WHERE email_verified = 1", )
-        existing_student = cur.fetchone()
+        existing_student = cur.fetchall()
 
         if not existing_student:
             flash('Email is Not verified.',

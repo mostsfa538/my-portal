@@ -22,9 +22,13 @@ def edit_profile_view():
     id = session['id']
     role = session['role']
     form = edit_profile()
+    cur = mysql.connection.cursor()
+    cur.execute(
+        f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
+    pfp = cur.fetchone()[0]
     if form.validate_on_submit():
-        name = form.Name.data
-        name = name.split()
+        # name = form.Name.data
+        # name = name.split()
         photo = form.Photo.data
 
         if photo and allowed_file(photo.filename):
@@ -32,18 +36,15 @@ def edit_profile_view():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo.save(filepath)
             filepath = filepath[1:]
-            cur = mysql.connection.cursor()
             cur.execute(
                 f"UPDATE {role} SET\
-                first_name = %s, last_name = %s, profile_avatar = %s WHERE id = {id}",
-                (name[0], name[1], filepath))
-            # cur.execute("UPDATE teacher SET first_name = %s, profile_avatar = %s WHERE email = %s",
-            # (name, filepath, session['email']))
+                profile_avatar = %s WHERE id = {id}",
+                (filepath,))
             mysql.connection.commit()
             cur.close()
             return redirect('/home')
 
-    return render_template('edit_profile.html', form=form)
+    return render_template('edit_profile.html', form=form, pfp_link=pfp)
 
 
 @app.route('/test')
