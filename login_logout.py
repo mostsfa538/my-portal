@@ -154,12 +154,12 @@ def logins():
                                 SELECT email FROM teacher\
                                 WHERE email_verified = 1", )
         existing_student = cur.fetchone()
-        cur.close()
 
         if not existing_student:
             flash('Email is Not verified.',
                   'danger')
             return redirect('/verifyRegister')
+
         cur.execute("""
             SELECT email, password, id, 'student' as role
             FROM student
