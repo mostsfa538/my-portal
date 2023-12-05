@@ -1,0 +1,51 @@
+{% extends "subject.html"%}
+{% block subject_page%}
+<div class="container container-fluid mt-5">
+    <h2 class="form-title">Quiz info</h2>
+    <form class="custom-border" method="post" action="/subject/{{ code }}/add_quiz">
+        <div class="form-group">
+            <label for="link">Link</label>
+            <input type="text" class="form-control" id="link" placeholder="Enter link" name="link" required>
+        </div>
+
+        <div class="form-group">
+            <label for="duration">Duration</label>
+            <input type="number" class="form-control" id="duration" placeholder="Enter duration" name="duration"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="quizTime">Time</label>
+            <input type="datetime-local" class="form-control" id="quizTime" placeholder="Enter time" name="time"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="instructions">Instructions</label>
+            <textarea class="form-control" id="instructions" rows="3" placeholder="Enter instructions" name="inst"
+                required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<script>
+    function validateForm()
+    {
+        var durationInput = document.getElementById('duration');
+        var durationError = document.getElementById('durationError');
+
+        if (durationInput.value < 1)
+        {
+            durationError.textContent = 'Duration must be at least 1 minute.';
+            return false;
+        } else
+        {
+            durationError.textContent = '';
+            return true;
+        }
+    }
+</script>
+
+{%endblock subject_page%}
