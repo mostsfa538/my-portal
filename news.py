@@ -28,6 +28,9 @@ def news_page(code):
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
     cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
+    cur.execute(
         f"SELECT `message` , `teacher_id`\
         FROM subject_ann_chat WHERE sub_id = {sub_id}"
     )
@@ -56,4 +59,4 @@ def news_page(code):
     return render_template('news.html', role=role,
                            code=code, pfp_link=pfp,
                            messages=messages, form=form,
-                           title="News")
+                           title="News", lecs=lecs)

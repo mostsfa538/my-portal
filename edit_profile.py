@@ -1,11 +1,11 @@
 from DB_connect import mysql, app
-from flask import render_template, redirect, session, request, url_for
+from flask import render_template, redirect, session
 from form import edit_profile
 import os
 from werkzeug.utils import secure_filename
-import uuid
 
-UPLOAD_FOLDER = './static/data/users_pfp/'
+
+UPLOAD_FOLDER = './static/data/'
 ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg']
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -27,13 +27,12 @@ def edit_profile_view():
         f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
     pfp = cur.fetchone()[0]
     if form.validate_on_submit():
-        # name = form.Name.data
-        # name = name.split()
         photo = form.Photo.data
 
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'],
+                                    f'users_pfp/{filename}')
             photo.save(filepath)
             filepath = filepath[1:]
             cur.execute(

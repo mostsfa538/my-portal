@@ -8,9 +8,9 @@ from grades import *
 from chat import *
 from quiz import *
 from edit_profile import *
-from flask import Flask
+from lecture import *
 
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 
 
 if __name__ == '__main__':

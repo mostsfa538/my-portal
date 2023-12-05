@@ -45,11 +45,11 @@
 								Lectures
 							</a>
 							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="#">Lecture 1</a></li>
-								<li><a class="dropdown-item" href="#">Lecture 2</a></li>
-								<li><a class="dropdown-item" href="#">Lecture 3</a></li>
+								{% for lec in lecs %}
+								<li><a class="dropdown-item" href="/subject/{{ code }}/lecture/{{lec[1]}}">Lecture {{lec[0]}}</a></li>
+								{% endfor %}
 								{% if role == "teacher"%}
-								<li><a class="dropdown-item" href="#">Add Lecture</a></li>
+								<li><a class="dropdown-item" href="/subject/{{ code }}/add_lecture">Add Lecture</a></li>
 								{% endif %}
 							</ul>
 						</li>

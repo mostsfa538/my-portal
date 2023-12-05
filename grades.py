@@ -28,6 +28,9 @@ def grades(code):
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     if role == "teacher":
         cur.execute(
             f"SELECT grade, student_id FROM grade WHERE sub_id = {sub_id}")
@@ -43,7 +46,7 @@ def grades(code):
         cur.close()
         return render_template('grades_teacher.html',
                                role=role, code=code, title="Grades",
-                               pfp_link=pfp, grades=grades)
+                               pfp_link=pfp, grades=grades, lecs=lecs)
     else:
         cur.execute(
             f"SELECT grade FROM grade\
@@ -52,7 +55,7 @@ def grades(code):
         grade = cur.fetchone()[0]
         return render_template('grades_student.html', pfp_link=pfp,
                                role=role, code=code, grade=grade,
-                               title="Grades")
+                               title="Grades", lecs=lecs)
 
 
 @app.route("/subject/<string:code>/grades/api/download", methods=['GET'])

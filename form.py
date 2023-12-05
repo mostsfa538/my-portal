@@ -87,9 +87,23 @@ class SendNews(FlaskForm):
 
 
 class edit_profile(FlaskForm):
-    # Name = StringField('Name', validators=[DataRequired(),
-                            # Length(min=2, max=15)])
     Photo = FileField('Photo', validators=[
-        FileAllowed(['jpg', 'png', 'jpeg'], 'Only JPEG and PNG images are allowed.')
+        FileAllowed(['jpg', 'png', 'jpeg'],
+                    'Only JPEG and PNG images are allowed.')
     ])
     submit = SubmitField('Update Profile')
+
+
+class UploadPDF(FlaskForm):
+    pdf_slide = FileField('Slide File',
+                          validators=[DataRequired(), FileAllowed(
+                              ['pdf', 'pptx', 'ppt'],
+                              'Only PDF and PPT files are allowed.')
+                          ]
+                          )
+    pdf_sheet = FileField('Sheet File',
+                          validators=[DataRequired(), FileAllowed(
+                              ['pdf', 'pptx', 'ppt'],
+                              'Only PDF and PPT files are allowed.')
+                          ]
+                          )

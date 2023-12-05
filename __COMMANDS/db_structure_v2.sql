@@ -123,6 +123,16 @@ CREATE TABLE pdfs(
 	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE
 );
 
+CREATE TABLE sheets(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	file_link varchar(256) NOT NULL,
+	submit_link varchar(256) NOT NULL,
+	lec_id INT NOT NULL,
+	FOREIGN KEY (lec_id) REFERENCES lecture(id) ON DELETE CASCADE,
+	sub_id INT NOT NULL,
+	FOREIGN KEY (sub_id) REFERENCES subject(id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE grade(
 	id INT PRIMARY KEY AUTO_INCREMENT,

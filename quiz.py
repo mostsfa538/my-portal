@@ -39,10 +39,13 @@ def quiz_room(code):
     """)
     quizzes = cur.fetchall()
     quizzes = [list(quiz) + [index + 1] for index, quiz in enumerate(quizzes)]
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     cur.close()
     return render_template('quiz_room.html', role=role,
                            code=code, pfp_link=pfp,
-                           quiz=quizzes, title="Quiz Room")
+                           quiz=quizzes, title="Quiz Room", lecs=lecs)
 
 
 @app.route("/subject/<string:code>/add_quiz", methods=['GET', 'POST'])
@@ -68,6 +71,9 @@ def add_quiz(code):
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     if request.method == 'POST':
         link = request.form['link']
         duration = request.form['duration']
@@ -85,4 +91,4 @@ def add_quiz(code):
         cur.close()
     return render_template('add_quiz.html', role=role,
                            code=code, pfp_link=pfp,
-                           title="Add Quiz")
+                           title="Add Quiz", lecs=lecs)

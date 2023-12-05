@@ -28,11 +28,14 @@ def chat_page(code):
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
     chat_messages = get_chat_messages(code)
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     cur.close()
     return render_template('chat.html', role=role,
                            code=code, title="Chat",
                            chat_messages=chat_messages,
-                           pfp_link=pfp)
+                           pfp_link=pfp, lecs=lecs)
 
 
 @app.route('/subject/<string:code>/chat/api/send', methods=['POST'])

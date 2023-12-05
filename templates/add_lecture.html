@@ -1,0 +1,44 @@
+{% extends "subject.html"%}
+{% block subject_page%}
+<div class="h-100 col">
+	<div class="container border-start border-2 border-primary shadow-lg justify-content-center py-3 px-6">
+		<div class="text-center mb-4 mt-2">
+			<h2>New Lecture</h2>
+		</div>
+		<form method="POST" action="/subject/{{ code }}/add_lecture" enctype="multipart/form-data">
+			<div class="input-group my-4">
+				<label for="title" class="fw-bold input-group-text bg-primary col-1">Title</label>
+				<input type="text" class="form-control" id="title" name="title" placeholder="Write title of the lecture"
+					required>
+			</div>
+			<div class="input-group my-4">
+				<label for="video" class="fw-bold input-group-text bg-primary col-1">Vedio</label>
+				<input type="text" class="form-control" id="video" name="video" placeholder="Past link of the video"
+					required>
+			</div>
+			<div class="input-group my-4">
+				{{ form.pdf_slide.label(class="fw-bold input-group-text bg-primary col-1") }}
+		        {{ form.pdf_slide(class="form-control") }}
+			</div>
+			<div class="input-group my-4">
+				{{ form.pdf_sheet.label(class="fw-bold input-group-text bg-primary col-1") }}
+		        {{ form.pdf_sheet(class="form-control") }}
+			</div>
+			<div class="input-group my-4">
+				<label for="link" class="fw-bold input-group-text bg-primary col-1">Link</label>
+				<input type="text" class="form-control" id="link" name="link"
+					placeholder="Googel form link to submit the sheet" required>
+			</div>
+			<div class="input-group my-4">
+				<label for="notes" class="fw-bold input-group-text bg-primary col-1">Notes</label>
+				<textarea class="form-control" id="notes" name="notes"></textarea>
+			</div>
+			<div class="my-4 text-center">
+				<button class="fw-bold btn-outline-primary py-3 px-5 rounded" type="submit">
+					Add
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock subject_page %}

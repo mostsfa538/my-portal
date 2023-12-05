@@ -1,0 +1,53 @@
+{% extends "subject.html"%}
+{% block subject_page%}
+
+<div class="h-100 col">
+	<div class="row m-5 mt-2">
+		<div class="col text-center">
+			<h2>{{TitNot[0]}}</h2>
+		</div>
+	</div>
+	<div class="row m-5">
+		<div class="col-6 text-start dropend">
+			<button class="btn btn-secondary dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown"
+				aria-expanded="false">
+				Video
+			</button>
+			<ul class="dropdown-menu">
+				{% for video in Videos %}
+				<li><a href="{{video}}" class="dropdown-item">Video</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div class="col-6 text-end dropstart">
+			<button class="btn btn-secondary dropdown-toggle text-dark" type="button" data-bs-toggle="dropdown"
+				aria-expanded="false">
+				PDF
+			</button>
+			<ul class="dropdown-menu">
+				{% for Slide in Slides %}
+				<li><a href="{{Slide}}" class="dropdown-item">Slides</a></li>
+				{% endfor %}
+				{% for Sheet in Sheets %}
+				<li><a href="{{Sheet[0]}}" class="dropdown-item">Sheet</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="row m-5">
+		<div class="col">
+			<h4 class="text-center">Lecture Notes</h4>
+			<div class="bg-secondary mt-4 p-5 shadow">
+				{{TitNot[1]}}
+			</div>
+		</div>
+	</div>
+	{% for Sheet in Sheets %}
+	<div class="row m-5">
+		<div class="col m-2 text-center bg-secondary py-3 px-5">
+			<a href="{{Sheet[1]}}" class="fw-bold link-dark">Submit Sheet</a>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endblock subject_page %}

@@ -21,14 +21,20 @@ def subject_page(code):
     sub_id = result[0]
     sub_name = result[1]
     cur.execute(
-        f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `{role}_sub`\
+        WHERE sub_id = {sub_id} and `{role}_id` = {id}"
+    )
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     cur.close()
     return render_template('subject.html', role=role,
                            code=code, pfp_link=pfp,
-                           main_page=1, title=sub_name)
+                           main_page=1, title=sub_name,
+                           lecs=lecs)
 
 
 @app.route("/subject/<string:code>/book", methods=['GET'])
@@ -57,11 +63,15 @@ def book_page(code):
     result = cur.fetchall()
     links = result if result else []
     links = [list(link)[0] for link in links]
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     cur.close()
     print(result)
     return render_template('book.html', role=role,
                            code=code, pfp_link=pfp,
-                           links=links, title="Book")
+                           links=links, title="Book",
+                           lecs=lecs)
 
 
 @app.route('/subject/<string:code>/students', methods=['GET'])
@@ -99,11 +109,14 @@ def list_students(code):
                 """)
     students = cur.fetchall()
     students = [list(student) for student in students]
+    cur.execute(
+        f"SELECT id FROM lecture WHERE sub_id = {sub_id}")
+    lecs = [[index + 1, int(id[0])] for index, id in enumerate(cur.fetchall())]
     cur.close()
     return render_template('list_students.html',
                            role=role, code=code,
                            pfp_link=pfp, students=students,
-                           title="List Students")
+                           title="List Students", lecs=lecs)
 
 
 @app.route('/subject/<string:code>/students/delete', methods=['POST'])
