@@ -45,7 +45,12 @@ def grades(code):
                                role=role, code=code,
                                pfp_link=pfp, grades=grades)
     else:
-        return ('no')
+        cur.execute(
+            f"SELECT grade FROM grade\
+            WHERE sub_id = {sub_id} and student_id = {id}"
+        )
+        grade = cur.fetchone()[0]
+        return render_template('grades_student.html', pfp_link=pfp, role=role, code=code, grade=grade)
 
 
 @app.route("/subject/<string:code>/grades/api/download", methods=['GET'])
@@ -64,8 +69,8 @@ def download_grades(code):
     sub_id = result[0]
     sub_name = result[1]
     cur.execute(
-        f"SELECT * from `{role}_sub`\
-        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `teacher_sub`\
+        WHERE sub_id = {sub_id} and `teacher_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
@@ -105,8 +110,8 @@ def edit_grades(code):
         return redirect('/custom_404')
     sub_id = result[0]
     cur.execute(
-        f"SELECT * from `{role}_sub`\
-        WHERE sub_id = {sub_id} and `{role}_id` = {id}")
+        f"SELECT * from `teacher_sub`\
+        WHERE sub_id = {sub_id} and `teacher_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
