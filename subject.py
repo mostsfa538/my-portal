@@ -11,21 +11,24 @@ def subject_page(code):
     role = session['role']
     cur = mysql.connection.cursor()
     cur.execute(
-        f"SELECT profile_avatar FROM `{session['role']}` WHERE id = {id}")
+        f"SELECT profile_avatar FROM `{role}` WHERE id = {id}")
     pfp = cur.fetchone()[0]
     cur.execute(
-        f"SELECT id FROM `subject` WHERE `code` = '{code}'")
+        f"SELECT id, name FROM `subject` WHERE `code` = '{code}'")
     result = cur.fetchone()
     if not result:
         return redirect('/custom_404')
     sub_id = result[0]
+    sub_name = result[1]
     cur.execute(
         f"SELECT * from `{role}_sub` WHERE sub_id = {sub_id} and `{role}_id` = {id}")
     result = cur.fetchall()
     if not result:
         return redirect(url_for('home', alert='notAllowed'))
     cur.close()
-    return render_template('subject.html', role=role, code=code, pfp_link=pfp, main_page=1)
+    return render_template('subject.html', role=role,
+                           code=code, pfp_link=pfp,
+                           main_page=1, title=sub_name)
 
 
 @app.route("/subject/<string:code>/book", methods=['GET'])
@@ -56,7 +59,9 @@ def book_page(code):
     links = [list(link)[0] for link in links]
     cur.close()
     print(result)
-    return render_template('book.html', role=role, code=code, pfp_link=pfp, links=links)
+    return render_template('book.html', role=role,
+                           code=code, pfp_link=pfp,
+                           links=links, title="Book")
 
 
 @app.route('/subject/<string:code>/students', methods=['GET'])
@@ -97,7 +102,8 @@ def list_students(code):
     cur.close()
     return render_template('list_students.html',
                            role=role, code=code,
-                           pfp_link=pfp, students=students)
+                           pfp_link=pfp, students=students,
+                           title="List Students")
 
 
 @app.route('/subject/<string:code>/students/delete', methods=['POST'])

@@ -44,26 +44,5 @@ def edit_profile_view():
             cur.close()
             return redirect('/home')
 
-    return render_template('edit_profile.html', form=form, pfp_link=pfp)
-
-
-@app.route('/test')
-def testt():
-    if 'id' not in session.keys():
-        return redirect('/login')
-    id = session['id']
-    role = session['role']
-    cur = mysql.connection.cursor()
-    cur.execute(
-        f"SELECT profile_avatar FROM {role}\
-        WHERE id = {id}")
-
-    result = cur.fetchone()
-    cur.close()
-    if result:
-        photo_url = result[0]
-        print(f"Debug: photo_url = {photo_url}")
-    # else:
-        # photo_url=url_for('static', filename='Image.jpg')
-
-    return render_template('test.html', photo_url=photo_url)
+    return render_template('edit_profile.html', form=form,
+                           pfp_link=pfp, title="Edit Profile")

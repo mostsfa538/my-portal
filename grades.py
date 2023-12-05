@@ -42,7 +42,7 @@ def grades(code):
             grades[index].append(std_name)
         cur.close()
         return render_template('grades_teacher.html',
-                               role=role, code=code,
+                               role=role, code=code, title="Grades",
                                pfp_link=pfp, grades=grades)
     else:
         cur.execute(
@@ -50,7 +50,9 @@ def grades(code):
             WHERE sub_id = {sub_id} and student_id = {id}"
         )
         grade = cur.fetchone()[0]
-        return render_template('grades_student.html', pfp_link=pfp, role=role, code=code, grade=grade)
+        return render_template('grades_student.html', pfp_link=pfp,
+                               role=role, code=code, grade=grade,
+                               title="Grades")
 
 
 @app.route("/subject/<string:code>/grades/api/download", methods=['GET'])
@@ -151,7 +153,8 @@ def edit_grades(code):
     alerts = request.args.get('error', default=None)
     if alerts:
         flash(alerts)
-    return render_template('edit_grades.html', grades=grades, code=code)
+    return render_template('edit_grades.html', grades=grades,
+                           code=code, title="Edit Grades")
 
 
 @app.route('/subject/<string:code>/grades/api/upload', methods=['POST'])

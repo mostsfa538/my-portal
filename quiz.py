@@ -41,7 +41,8 @@ def quiz_room(code):
     quizzes = [list(quiz) + [index + 1] for index, quiz in enumerate(quizzes)]
     cur.close()
     return render_template('quiz_room.html', role=role,
-                           code=code, pfp_link=pfp, quiz=quizzes)
+                           code=code, pfp_link=pfp,
+                           quiz=quizzes, title="Quiz Room")
 
 
 @app.route("/subject/<string:code>/add_quiz", methods=['GET', 'POST'])
@@ -83,4 +84,5 @@ def add_quiz(code):
         mysql.connection.commit()
         cur.close()
     return render_template('add_quiz.html', role=role,
-                           code=code, pfp_link=pfp)
+                           code=code, pfp_link=pfp,
+                           title="Add Quiz")

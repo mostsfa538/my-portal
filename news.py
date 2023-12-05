@@ -47,9 +47,13 @@ def news_page(code):
         message = form.message.data
         cursor = mysql.connection.cursor()
         cursor.execute(
-            f"INSERT INTO `subject_ann_chat` (message,teacher_id,sub_id) VALUES ('{message}' ,{session['id']},{sub_id})"
+            f"INSERT INTO `subject_ann_chat` (message,teacher_id,sub_id)\
+            VALUES ('{message}' , {id}, {sub_id})"
         )
         mysql.connection.commit()
         cursor.close()
         return redirect(f"/subject/{code}/news")
-    return render_template('news.html', role=role, code=code, pfp_link=pfp, messages=messages, form=form)
+    return render_template('news.html', role=role,
+                           code=code, pfp_link=pfp,
+                           messages=messages, form=form,
+                           title="News")

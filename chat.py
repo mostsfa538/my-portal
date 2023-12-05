@@ -30,7 +30,7 @@ def chat_page(code):
     chat_messages = get_chat_messages(code)
     cur.close()
     return render_template('chat.html', role=role,
-                           code=code,
+                           code=code, title="Chat",
                            chat_messages=chat_messages,
                            pfp_link=pfp)
 
